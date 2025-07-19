@@ -138,3 +138,4 @@ dist
 release/
 out/
 mcp-manager.win32-x64-msvc.node
+app_db/
