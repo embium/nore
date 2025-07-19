@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": ["DOM", "ESNext"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/src/*": ["src/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/components/*": ["src/renderer/components/*"],
+      "@/assets/*": ["src/assets/*"],
+      "@/pages/*": ["src/renderer/routes/*"],
+      "@/app/*": ["src/renderer/app/*"],
+      "@/styles/*": ["src/renderer/styles/*"],
+      "@/hooks/*": ["src/renderer/hooks/*"],
+      "@/utils/*": ["src/renderer/utils/*"],
+      "@/lib/*": ["src/renderer/lib/*"],
+      "@/features/*": ["src/renderer/features/*"],
+      "@/main/*": ["src/main/*"],
+      "@/preload/*": ["src/preload/*"],
+      "@/types/*": ["src/types/*"]
+    }
+  },
+  "include": ["src"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}

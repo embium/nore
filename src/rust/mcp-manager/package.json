@@ -1,0 +1,30 @@
+{
+  "name": "@nore/mcp-manager",
+  "version": "0.1.0",
+  "description": "Rust backend exposed as Node.js addon via napi-rs",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "mcp-manager",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-pc-windows-msvc",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:electron": "cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics --release"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
+    "cargo-cp-artifact": "^0.1.9"
+  },
+  "engines": {
+    "node": ">= 16"
+  }
+}

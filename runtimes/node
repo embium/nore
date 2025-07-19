@@ -1,0 +1,67 @@
+#!/bin/bash
+# This product includes software developed at Square, Inc.
+# 
+# The Initial Developer of some parts of the framework, which are copied 
+# from, derived from, or inspired by Hermit, is Square, Inc. (https://squareup.com).
+# Copyright 2021 Square, Inc. All Rights Reserved.
+# 
+# The Initial Developer of Hermit is Square, Inc. (http://www.squareup.com).
+# Copyright 2021 Square, Inc. All Rights Reserved.
+
+set -euo pipefail
+LOGFILE="$HOME/.logs/notebit/node.log"
+echo >> $LOGFILE
+
+log() {
+    local LINE="$1"
+    local DATE="$(date +'%Y-%m-%d')"
+    local TIME="$(date +'%H:%M:%S')"
+    echo "[$DATE][$TIME][hermit][DEBUG] $LINE" >> $LOGFILE
+}
+trap 'log "ERROR: Exiting w/ status: $?."' ERR
+
+log "Starting..."
+
+log "mkdir -p ~/.config/notebit/hermit/bin ?"
+mkdir -p ~/.config/notebit/hermit/bin
+
+log "cd ~/.config/notebit/hermit"
+cd ~/.config/notebit/hermit
+
+if [ ! -f ~/.config/notebit/hermit/bin/hermit ]; then
+    log "Downloading hermit..."
+    curl -fsSL "https://github.com/cashapp/hermit/releases/download/stable/hermit-$(uname -s \
+        | tr '[:upper:]' '[:lower:]')-$(uname -m \
+        | sed 's/x86_64/amd64/' \
+        | sed 's/aarch64/arm64/').gz" \
+        | gzip -dc > ~/.config/notebit/hermit/bin/hermit
+    log "Downloaded hermit..."
+
+    log "chmod +x ~/.config/notebit/hermit/bin/hermit"
+    chmod +x ~/.config/notebit/hermit/bin/hermit
+else
+    log "Found existing hermit..."
+fi
+
+log "mkdir -p ~/.config/notebit/hermit/cache"
+mkdir -p ~/.config/notebit/hermit/cache
+
+log "export HERMIT_STATE_DIR=~/.config/notebit/hermit/cache"
+export HERMIT_STATE_DIR=~/.config/notebit/hermit/cache
+
+log "export PATH=~/.config/notebit/hermit/bin:$PATH"
+export PATH=~/.config/notebit/hermit/bin:$PATH
+
+log "hermit init"
+hermit init >> "$LOGFILE"
+
+log "chmod +x hermit"
+chmod +x ~/.config/notebit/hermit/bin/hermit
+
+log "hermit install node >> "$LOGFILE""
+hermit install node@lts >> "$LOGFILE"
+
+log "node $*"
+node "$@" || log "Error running node $*"
+
+log "End."
