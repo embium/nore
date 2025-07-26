@@ -8,8 +8,7 @@
 mod error;
 mod manager;
 mod models;
-mod workspace;
-mod workspace_wrapper;
+mod wrapper;
 
 // Re-export the public API
 pub use error::error_codes;
@@ -24,5 +23,5 @@ fn init() {
         .init();
 }
 
-// Export the MCP manager wrapper (now using the workspace-based implementation)
-pub use crate::workspace_wrapper::McpManagerWrapper;
+// Export the MCP manager wrapper
+pub use crate::wrapper::McpManagerWrapper;

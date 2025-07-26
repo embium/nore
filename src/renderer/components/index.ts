@@ -1,4 +1,5 @@
 import Icon from './icon';
-import Layout from './layout';
+import { LeftSidebar } from './LeftSidebar';
+import { Middlebar } from './Middlebar';
 
-export { Icon, Layout };
+export { Icon, LeftSidebar, Middlebar };

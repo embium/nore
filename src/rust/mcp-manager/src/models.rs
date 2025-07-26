@@ -1,7 +1,6 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// Configuration for starting an MCP server
 #[napi(object)]
@@ -13,8 +12,6 @@ pub struct ServerConfig {
     pub command: String,
     /// Arguments to pass to the command
     pub args: Vec<String>,
-    /// Environment variables to pass to the command
-    pub env: Option<HashMap<String, String>>,
 }
 
 /// Information about a tool provided by an MCP server

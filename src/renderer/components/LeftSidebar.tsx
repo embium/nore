@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { FiMessageSquare } from 'react-icons/fi';
 import { MdOutlineWidgets } from 'react-icons/md';
 import { LuBrain } from 'react-icons/lu';
@@ -13,17 +13,70 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { observer } from '@legendapp/state/react';
+import SettingsModal from '../features/settings/components/SettingsModal';
+import { PromptsLibraryModal } from '../features/prompts-library/components/PromptsLibraryModal';
+import { ModelHubModal } from '../features/model-hub/components/ModelHubModal';
+import { addServer, startServer } from '../features/mcp/state';
+import { v4 as uuidv4 } from 'uuid';
+import { trpcProxyClient } from '@/src/shared/config';
+import { useNavigate } from '@tanstack/react-router';
+interface LeftSidebarProps {}
 
-export function LeftSidebar() {
-  const handleSetChatsTab = () => {};
+export const LeftSidebar: React.FC<LeftSidebarProps> = observer(() => {
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [promptsLibraryModalVisible, setPromptsLibraryModalVisible] =
+    useState(false);
+  const [modelHubModalVisible, setModelHubModalVisible] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSetMcpServersTab = () => {};
+  const handleChats = () => {
+    navigate({ to: '/chat' });
+  };
 
-  const handleSetModelHubTab = () => {};
+  const handleMcpServers = () => {
+    navigate({ to: '/mcp-servers' });
+  };
 
-  const handleSetPromptsLibraryTab = () => {};
+  const handleModelHubModalOpen = () => {
+    setModelHubModalVisible(true);
+  };
 
-  const handleSetSettingsTab = () => {};
+  const handleModelHubModalClose = () => {
+    setModelHubModalVisible(false);
+  };
+
+  const handlePromptsLibraryModalOpen = () => {
+    setPromptsLibraryModalVisible(true);
+  };
+
+  const handlePromptsLibraryModalClose = () => {
+    setPromptsLibraryModalVisible(false);
+  };
+
+  const handleSettingsModalOpen = useCallback(() => {
+    setSettingsModalVisible(true);
+  }, []);
+
+  const handleSettingsModalClose = useCallback(() => {
+    setSettingsModalVisible(false);
+  }, []);
+
+  const handleAddServer = async () => {
+    /*
+    addServer({
+      id: 'mcp-knowledge-graph',
+      name: 'Knowledge Graph',
+      command: 'npx',
+      args: ['-y', '@itseasy21/mcp-knowledge-graph'],
+      status: 'stopped',
+    });
+    startServer('mcp-knowledge-graph');
+    */
+    const tools = await trpcProxyClient.mcp.getTools.query();
+    console.log(tools);
+  };
+
   return (
     <div className="flex flex-col h-full border-r transition-all duration-200 ease-in-out w-[60px] items-center">
       <div className="flex flex-col h-[60px] border-b items-center justify-center">
@@ -42,7 +95,7 @@ export function LeftSidebar() {
               <div className="flex items-center">
                 <Button
                   variant="ghost"
-                  onClick={handleSetChatsTab}
+                  onClick={handleChats}
                 >
                   <FiMessageSquare className="scale-125" />
                 </Button>
@@ -63,9 +116,9 @@ export function LeftSidebar() {
               <div className="flex items-center">
                 <Button
                   variant="ghost"
-                  onClick={handleSetMcpServersTab}
+                  onClick={handleMcpServers}
                 >
-                  <FiMessageSquare className="scale-125" />
+                  <LuBrain className="scale-125" />
                 </Button>
               </div>
             </TooltipTrigger>
@@ -73,7 +126,7 @@ export function LeftSidebar() {
               side="right"
               align="center"
             >
-              <p>Chats</p>
+              <p>MCP Servers</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -87,7 +140,7 @@ export function LeftSidebar() {
               <div className="flex items-center">
                 <Button
                   variant="ghost"
-                  onClick={handleSetModelHubTab}
+                  onClick={handleModelHubModalOpen}
                 >
                   <MdOutlineWidgets className="scale-125" />
                 </Button>
@@ -108,28 +161,7 @@ export function LeftSidebar() {
               <div className="flex items-center">
                 <Button
                   variant="ghost"
-                  onClick={handleSetMcpServersTab}
-                >
-                  <LuBrain className="scale-125" />
-                </Button>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent
-              side="right"
-              align="center"
-            >
-              <p>MCP Servers</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  onClick={handleSetPromptsLibraryTab}
+                  onClick={handlePromptsLibraryModalOpen}
                 >
                   <FiBookOpen className="scale-125" />
                 </Button>
@@ -150,7 +182,7 @@ export function LeftSidebar() {
               <div className="flex items-center">
                 <Button
                   variant="ghost"
-                  onClick={handleSetSettingsTab}
+                  onClick={handleSettingsModalOpen}
                 >
                   <FiSettings className="scale-125" />
                 </Button>
@@ -165,6 +197,24 @@ export function LeftSidebar() {
           </Tooltip>
         </TooltipProvider>
       </div>
+      {modelHubModalVisible && (
+        <ModelHubModal
+          visible={modelHubModalVisible}
+          onClose={handleModelHubModalClose}
+        />
+      )}
+      {promptsLibraryModalVisible && (
+        <PromptsLibraryModal
+          visible={promptsLibraryModalVisible}
+          onClose={handlePromptsLibraryModalClose}
+        />
+      )}
+      {settingsModalVisible && (
+        <SettingsModal
+          visible={settingsModalVisible}
+          onClose={handleSettingsModalClose}
+        />
+      )}
     </div>
   );
-}
+});

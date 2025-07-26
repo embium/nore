@@ -8,19 +8,24 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ChatLayoutImport } from './routes/chat/_layout'
-
-// Create Virtual Routes
-
-const ChatImport = createFileRoute('/chat')()
-const IndexLazyImport = createFileRoute('/')()
+import { Route as McpServersImport } from './routes/mcp-servers'
+import { Route as ChatImport } from './routes/chat'
+import { Route as IndexImport } from './routes/index'
+import { Route as McpServersIndexImport } from './routes/mcp-servers/index'
+import { Route as ChatIndexImport } from './routes/chat/index'
+import { Route as McpServersRegistryImport } from './routes/mcp-servers/registry'
+import { Route as McpServersServerIdImport } from './routes/mcp-servers/$serverId'
 
 // Create/Update Routes
+
+const McpServersRoute = McpServersImport.update({
+  id: '/mcp-servers',
+  path: '/mcp-servers',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ChatRoute = ChatImport.update({
   id: '/chat',
@@ -28,15 +33,34 @@ const ChatRoute = ChatImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
-const ChatLayoutRoute = ChatLayoutImport.update({
-  id: '/_layout',
+const McpServersIndexRoute = McpServersIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => McpServersRoute,
+} as any)
+
+const ChatIndexRoute = ChatIndexImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => ChatRoute,
+} as any)
+
+const McpServersRegistryRoute = McpServersRegistryImport.update({
+  id: '/registry',
+  path: '/registry',
+  getParentRoute: () => McpServersRoute,
+} as any)
+
+const McpServersServerIdRoute = McpServersServerIdImport.update({
+  id: '/$serverId',
+  path: '/$serverId',
+  getParentRoute: () => McpServersRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -47,7 +71,7 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
     '/chat': {
@@ -57,12 +81,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatImport
       parentRoute: typeof rootRoute
     }
-    '/chat/_layout': {
-      id: '/chat/_layout'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatLayoutImport
-      parentRoute: typeof ChatRoute
+    '/mcp-servers': {
+      id: '/mcp-servers'
+      path: '/mcp-servers'
+      fullPath: '/mcp-servers'
+      preLoaderRoute: typeof McpServersImport
+      parentRoute: typeof rootRoute
+    }
+    '/mcp-servers/$serverId': {
+      id: '/mcp-servers/$serverId'
+      path: '/$serverId'
+      fullPath: '/mcp-servers/$serverId'
+      preLoaderRoute: typeof McpServersServerIdImport
+      parentRoute: typeof McpServersImport
+    }
+    '/mcp-servers/registry': {
+      id: '/mcp-servers/registry'
+      path: '/registry'
+      fullPath: '/mcp-servers/registry'
+      preLoaderRoute: typeof McpServersRegistryImport
+      parentRoute: typeof McpServersImport
+    }
+    '/chat/': {
+      id: '/chat/'
+      path: '/'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof ChatIndexImport
+      parentRoute: typeof ChatImport
+    }
+    '/mcp-servers/': {
+      id: '/mcp-servers/'
+      path: '/'
+      fullPath: '/mcp-servers/'
+      preLoaderRoute: typeof McpServersIndexImport
+      parentRoute: typeof McpServersImport
     }
   }
 }
@@ -70,49 +122,99 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface ChatRouteChildren {
-  ChatLayoutRoute: typeof ChatLayoutRoute
+  ChatIndexRoute: typeof ChatIndexRoute
 }
 
 const ChatRouteChildren: ChatRouteChildren = {
-  ChatLayoutRoute: ChatLayoutRoute,
+  ChatIndexRoute: ChatIndexRoute,
 }
 
 const ChatRouteWithChildren = ChatRoute._addFileChildren(ChatRouteChildren)
 
+interface McpServersRouteChildren {
+  McpServersServerIdRoute: typeof McpServersServerIdRoute
+  McpServersRegistryRoute: typeof McpServersRegistryRoute
+  McpServersIndexRoute: typeof McpServersIndexRoute
+}
+
+const McpServersRouteChildren: McpServersRouteChildren = {
+  McpServersServerIdRoute: McpServersServerIdRoute,
+  McpServersRegistryRoute: McpServersRegistryRoute,
+  McpServersIndexRoute: McpServersIndexRoute,
+}
+
+const McpServersRouteWithChildren = McpServersRoute._addFileChildren(
+  McpServersRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/chat': typeof ChatLayoutRoute
+  '/': typeof IndexRoute
+  '/chat': typeof ChatRouteWithChildren
+  '/mcp-servers': typeof McpServersRouteWithChildren
+  '/mcp-servers/$serverId': typeof McpServersServerIdRoute
+  '/mcp-servers/registry': typeof McpServersRegistryRoute
+  '/chat/': typeof ChatIndexRoute
+  '/mcp-servers/': typeof McpServersIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/chat': typeof ChatLayoutRoute
+  '/': typeof IndexRoute
+  '/mcp-servers/$serverId': typeof McpServersServerIdRoute
+  '/mcp-servers/registry': typeof McpServersRegistryRoute
+  '/chat': typeof ChatIndexRoute
+  '/mcp-servers': typeof McpServersIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
   '/chat': typeof ChatRouteWithChildren
-  '/chat/_layout': typeof ChatLayoutRoute
+  '/mcp-servers': typeof McpServersRouteWithChildren
+  '/mcp-servers/$serverId': typeof McpServersServerIdRoute
+  '/mcp-servers/registry': typeof McpServersRegistryRoute
+  '/chat/': typeof ChatIndexRoute
+  '/mcp-servers/': typeof McpServersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat'
+  fullPaths:
+    | '/'
+    | '/chat'
+    | '/mcp-servers'
+    | '/mcp-servers/$serverId'
+    | '/mcp-servers/registry'
+    | '/chat/'
+    | '/mcp-servers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat'
-  id: '__root__' | '/' | '/chat' | '/chat/_layout'
+  to:
+    | '/'
+    | '/mcp-servers/$serverId'
+    | '/mcp-servers/registry'
+    | '/chat'
+    | '/mcp-servers'
+  id:
+    | '__root__'
+    | '/'
+    | '/chat'
+    | '/mcp-servers'
+    | '/mcp-servers/$serverId'
+    | '/mcp-servers/registry'
+    | '/chat/'
+    | '/mcp-servers/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
+  IndexRoute: typeof IndexRoute
   ChatRoute: typeof ChatRouteWithChildren
+  McpServersRoute: typeof McpServersRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
   ChatRoute: ChatRouteWithChildren,
+  McpServersRoute: McpServersRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -126,21 +228,42 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/chat"
+        "/chat",
+        "/mcp-servers"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
     },
     "/chat": {
-      "filePath": "chat",
+      "filePath": "chat.tsx",
       "children": [
-        "/chat/_layout"
+        "/chat/"
       ]
     },
-    "/chat/_layout": {
-      "filePath": "chat/_layout.tsx",
+    "/mcp-servers": {
+      "filePath": "mcp-servers.tsx",
+      "children": [
+        "/mcp-servers/$serverId",
+        "/mcp-servers/registry",
+        "/mcp-servers/"
+      ]
+    },
+    "/mcp-servers/$serverId": {
+      "filePath": "mcp-servers/$serverId.tsx",
+      "parent": "/mcp-servers"
+    },
+    "/mcp-servers/registry": {
+      "filePath": "mcp-servers/registry.tsx",
+      "parent": "/mcp-servers"
+    },
+    "/chat/": {
+      "filePath": "chat/index.tsx",
       "parent": "/chat"
+    },
+    "/mcp-servers/": {
+      "filePath": "mcp-servers/index.tsx",
+      "parent": "/mcp-servers"
     }
   }
 }

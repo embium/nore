@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { GoSidebarExpand } from 'react-icons/go';
-import { observer, useSelector } from '@legendapp/state/react';
+import { observer } from '@legendapp/state/react';
 
 import { layoutState$ } from '@/app/state/layout';
 
 interface MiddlebarProps {
   headerTitle: React.ReactNode;
-  header: React.ReactNode;
+  headerContent: React.ReactNode;
   children: React.ReactNode;
 }
 
 export const Middlebar: React.FC<MiddlebarProps> = observer(
-  ({ headerTitle, header, children }) => {
+  ({ headerTitle, headerContent, children }) => {
     // Use Legend State for sidebar width
-    const isMiddlebarCollapsed = useSelector(layoutState$.middlebarCollapsed);
-    const middlebarWidth = useSelector(layoutState$.middlebarWidth);
+    const isMiddlebarCollapsed = layoutState$.middlebarCollapsed.get();
+    const middlebarWidth = layoutState$.middlebarWidth.get();
     const isResizing = useRef(false);
     const [isAnimating, setIsAnimating] = useState(true);
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -158,7 +158,7 @@ export const Middlebar: React.FC<MiddlebarProps> = observer(
               minWidth: `${middlebarWidth}px`,
             }}
           >
-            <div className="h-[60px] flex items-center justify-between px-3 border-b">
+            <div className="h-[60px] flex items-center justify-between px-3 border-b box-border flex-shrink-0">
               <div className="flex items-center">
                 <button
                   onClick={() =>
@@ -175,7 +175,7 @@ export const Middlebar: React.FC<MiddlebarProps> = observer(
                   {headerTitle}
                 </span>
               </div>
-              {header}
+              {headerContent}
             </div>
 
             <div className="flex-1 overflow-y-auto scrollbar-visible pr-3 h-full min-h-0">

@@ -1,5 +1,6 @@
 import { app } from 'electron';
 import pkg from '../../package.json';
+import { eventEmitter } from '@/shared/config/context';
 import { createMainWindow } from './windows/mainWindow';
 import { createSplashWindow, closeSplashWindow } from './windows/splashWindow';
 import { setupWindowEvents } from './events/windowEvents';
@@ -27,4 +28,7 @@ export function main() {
   });
 
   app.once('window-all-closed', () => app.quit());
+
+  // Make event emitter available globally for subscriptions
+  (global as any).eventEmitter = eventEmitter;
 }
