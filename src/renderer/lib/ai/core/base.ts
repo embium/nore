@@ -6,6 +6,7 @@ import {
   MessageContentParts,
   MessageToolCalls,
   MessageWebBrowsing,
+  ToolExecution,
 } from '@/types/chat';
 
 export interface ModelHelpers {
@@ -93,6 +94,7 @@ export interface ResultChange {
   contentParts?: MessageContentParts;
   tokenCount?: number;
   tokensUsed?: number;
+  toolExecutions?: ToolExecution[];
 }
 
 export type onResultChangeWithCancel = (

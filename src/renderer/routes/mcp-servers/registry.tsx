@@ -158,6 +158,7 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
 
     setIsInstalling(true);
     try {
+      console.log(selectedServer);
       installServerFromRegistry(selectedServer);
       setInstallDialogOpen(false);
     } catch (error) {

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 // Types
-import { Message } from '../../types';
+import { Message } from '@/types/chat';
 
 // Utils
 import { cn } from '@/lib/utils';

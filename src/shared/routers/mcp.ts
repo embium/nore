@@ -22,7 +22,7 @@ export const mcpRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const manager = new McpManager(() => {});
+      const manager = new McpManager('main', () => {});
 
       manager.start({
         id: input.id,
@@ -31,13 +31,15 @@ export const mcpRouter = router({
       });
       return true;
     }),
-  stopServer: publicProcedure.mutation(async () => {
-    const manager = new McpManager(() => {});
-    manager.stop('knowledge-graph');
-    return true;
-  }),
+  stopServer: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      const manager = new McpManager('main', () => {});
+      manager.stop(input.id);
+      return true;
+    }),
   getTools: publicProcedure.query(async () => {
-    const manager = new McpManager(() => {});
+    const manager = new McpManager('main', () => {});
     return manager.getTools();
   }),
   executeTool: publicProcedure
@@ -49,9 +51,8 @@ export const mcpRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const manager = new McpManager(() => {});
+      const manager = new McpManager('main', () => {});
       const result = await manager.executeTool(input);
-      console.log(result);
       return result;
     }),
   openLink: publicProcedure

@@ -5,7 +5,6 @@ import {
 } from '@/types/supportedFiles';
 import { Poppler } from 'node-poppler';
 import xlsx from 'node-xlsx';
-import officeParser from 'officeparser';
 import WordExtractor from 'word-extractor';
 import path from 'path';
 
@@ -127,9 +126,6 @@ export async function extractFileContent(item: {
       }
       return '';
     } else if (supportedDocumentFileTypes.includes(fileType)) {
-      const text = await officeParser.parseOfficeAsync(item.path);
-      return text;
-    } else if (fileType === 'doc' || fileType === 'ppt') {
       const extractor = new WordExtractor();
       const text = await extractor.extract(item.path);
       const body = text.getBody();

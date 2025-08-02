@@ -190,6 +190,15 @@ export type MessageToolCall = {
   };
 };
 
+export interface ToolExecution {
+  toolName: string;
+  parameters: unknown;
+  result: unknown;
+  timestamp: number;
+  duration: number;
+  error?: string;
+}
+
 export const MessageRoleEnum = {
   System: 'system',
   User: 'user',
@@ -238,6 +247,7 @@ export interface Message {
   tokensUsed?: number;
   timestamp?: number;
   firstTokenLatency?: number;
+  toolExecutions?: ToolExecution[];
 }
 
 export type MessageContentParts = (
@@ -250,4 +260,5 @@ export type StreamTextResult = {
   contentParts: MessageContentParts;
   reasoningContent?: string;
   usage?: LanguageModelUsage;
+  toolExecutions?: ToolExecution[];
 };

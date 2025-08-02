@@ -3,10 +3,11 @@ import { ChevronDown, ChevronUp, BrainIcon, Loader2 } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { Message } from '../../types';
+import { Message } from '@/types/chat';
 
 // Components
 import MarkdownRenderer from '@/components/markdown';
+import { ToolExecutions } from './ToolExecutions';
 
 // Hooks
 import { useMessageData } from '../../hooks/useMessageData';
@@ -107,6 +108,10 @@ const MessageContentComponent: React.FC<MessageContentProps> = ({
 
   return (
     <div data-message-id={message.id}>
+      {/* Show tool executions above assistant messages */}
+      {message.role === 'assistant' && message.toolExecutions && (
+        <ToolExecutions toolExecutions={message.toolExecutions} />
+      )}
       <div className={`message-content ${roleClass}`}>
         {renderContentWithReasoning()}
       </div>

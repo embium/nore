@@ -33,6 +33,14 @@ pub enum Error {
     /// Error executing a tool
     #[error("Tool execution error: {0}")]
     ToolExecutionError(String),
+    
+    /// Error when a manager is not found
+    #[error("Manager not found: {0}")]
+    ManagerNotFound(String),
+    
+    /// Error when a manager has been shut down
+    #[error("Manager shutdown: {0}")]
+    ManagerShutdown(String),
 
     /// Generic error
     #[error("{0}")]
@@ -53,6 +61,8 @@ impl From<Error> for NapiError {
             Error::ProcessStopError(_) => "PROCESS_STOP_ERROR",
             Error::CommunicationError(_) => "COMMUNICATION_ERROR",
             Error::ToolExecutionError(_) => "TOOL_EXECUTION_ERROR",
+            Error::ManagerNotFound(_) => "MANAGER_NOT_FOUND",
+            Error::ManagerShutdown(_) => "MANAGER_SHUTDOWN",
             Error::McpError(_) => "MCP_ERROR",
             Error::Other(_) => "UNKNOWN_ERROR",
         };
@@ -81,6 +91,12 @@ pub mod error_codes {
 
     #[napi(js_name = "TOOL_EXECUTION_ERROR")]
     pub const TOOL_EXECUTION_ERROR: &str = "TOOL_EXECUTION_ERROR";
+    
+    #[napi(js_name = "MANAGER_NOT_FOUND")]
+    pub const MANAGER_NOT_FOUND: &str = "MANAGER_NOT_FOUND";
+    
+    #[napi(js_name = "MANAGER_SHUTDOWN")]
+    pub const MANAGER_SHUTDOWN: &str = "MANAGER_SHUTDOWN";
 
     #[napi(js_name = "MCP_ERROR")]
     pub const MCP_ERROR: &str = "MCP_ERROR";

@@ -242,4 +242,4 @@ export const supportedTextFileTypes = [
   'sln', // Visual Studio Solution file (mostly text)
 ];
 
-export const supportedDocumentFileTypes = ['docx', 'pptx', 'odt', 'odp', 'ods'];
+export const supportedDocumentFileTypes = ['doc', 'docx', 'ppt', 'pptx'];

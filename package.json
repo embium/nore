@@ -1,14 +1,14 @@
 {
-  "name": "electrostatic",
-  "description": "Starter Template for electron apps with trpc , drizzle-orm and sqlite",
+  "name": "nore",
+  "description": "",
   "version": "0.0.1",
   "author": {
-    "email": "youremail@provider.com",
-    "name": "your_name"
+    "email": "mikeymooney1991@gmail.com",
+    "name": "Michael Mooney"
   },
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/Inalegwu/ElectroStatic.git"
+    "url": "https://github.com/embium/nore.git"
   },
   "main": "out/main/index.js",
   "scripts": {
@@ -64,7 +64,7 @@
     "node-html-parser": "^7.0.1",
     "node-poppler": "^8.0.3",
     "node-xlsx": "^0.24.0",
-    "officeparser": "^5.2.0",
+    "openai": "^5.11.0",
     "pouchdb-find": "^9.0.0",
     "pouchdb-node": "^9.0.0",
     "react": "^18.3.1",

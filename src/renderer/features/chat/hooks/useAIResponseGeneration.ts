@@ -28,7 +28,7 @@ import {
 
 // Types
 import { FileWithPreview } from '@/types/common';
-import { Message, MessageTextPart } from '@/types/chat';
+import { Message, MessageTextPart, ToolExecution } from '@/types/chat';
 import { onResultChangeWithCancel, ResultChange } from '@/lib/ai/core/base';
 
 // Hooks
@@ -136,16 +136,22 @@ export function useAIResponseGeneration(
 
   // Function to update a message by ID - keep this stable
   const updateMessageContent = useCallback(
-    (id: string, content: string, usedSmartHubs: string[]) => {
-      // Only update if content has changed to prevent unnecessary renders
-      if (messageContentRef.current !== content) {
-        messageContentRef.current = content;
-        // Log for debugging
+    (id: string, content: string, usedSmartHubs: string[], toolExecutions?: ToolExecution[]) => {
+      // Update if content has changed OR if we have tool executions to add
+      const contentChanged = messageContentRef.current !== content;
+      const hasToolExecutions = toolExecutions && toolExecutions.length > 0;
+      
+      if (contentChanged || hasToolExecutions) {
+        if (contentChanged) {
+          messageContentRef.current = content;
+        }
+        
         // Update in chat state
         updateMessage({
           messageId: id,
           content,
           usedSmartHubs: currentUsedSmartHubsRef.current,
+          toolExecutions,
         });
       }
     },
@@ -316,12 +322,13 @@ export function useAIResponseGeneration(
                   );
                 }
 
-                // Only update if content changed and message ID is valid
-                if (text && streamingMessageIdRef.current) {
+                // Always update if message ID is valid (for text content or tool executions)
+                if (streamingMessageIdRef.current) {
                   updateMessageContent(
                     streamingMessageIdRef.current,
                     text || '',
-                    currentUsedSmartHubsRef.current
+                    currentUsedSmartHubsRef.current,
+                    updated.toolExecutions
                   );
                 }
               },

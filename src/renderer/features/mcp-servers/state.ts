@@ -118,25 +118,48 @@ export function installServerFromRegistry(registryServer: RegistryServer) {
 
   // Parse the stdioFunction to extract command and args
   const functionBody = stdioConnection.stdioFunction;
-  // Extract command and args from the function string
-  // Example: "config => ({ command: 'npx', args: ['-y', '@modelcontextprotocol/server-memory'] })"
   console.log(functionBody);
   const commandMatch = functionBody.match(/command:\s*['"]([^'"]+)['"]/);
   const argsMatch = functionBody.match(/args:\s*\[([^\]]+)\]/);
 
   const command = commandMatch ? commandMatch[1] : 'npx';
   const argsString = argsMatch ? argsMatch[1] : '';
-  const args = argsString
-    .split(',')
-    .map((arg) => arg.trim().replace(/['"`]/g, ''))
-    .filter((arg) => arg.length > 0);
+
+  // Process args and extract environment variables
+  const args: string[] = [];
+  let env: Record<string, string> = {};
+
+  // Split by commas but respect backticks for template literals
+  const argParts = argsString.split(/,(?=(?:[^`]*`[^`]*`)*[^`]*$)/);
+
+  argParts.forEach((part) => {
+    const trimmed = part.trim();
+    if (!trimmed) return;
+
+    // Check if it's an environment variable in a template literal
+    // Example: `API_KEY="${config.TWENTY_FIRST_API_KEY}"`
+    const envVarMatch = trimmed.match(/^`([\w_]+)=\"\${config\.(\w+)}\"`$/);
+
+    if (envVarMatch) {
+      // This is an env variable, extract it
+      const [_, envName, configKey] = envVarMatch;
+      env[envName] = `${configKey}`;
+      // We don't add this to args as it's an env variable
+    } else if (/^['"`].*['"`]$/.test(trimmed)) {
+      // Regular quoted string, remove quotes
+      args.push(trimmed.replace(/^['"`]|['"`]$/g, ''));
+    } else {
+      // Other cases (might be a variable reference)
+      args.push(trimmed);
+    }
+  });
 
   const newServer: Server = {
     id: uuidv4(),
     name: registryServer.displayName,
     command,
     args,
-    env: {},
+    env,
     status: 'stopped',
     qualifiedName: registryServer.qualifiedName,
     displayName: registryServer.displayName,
@@ -199,7 +222,9 @@ export async function stopServer(serverId: string) {
   }
 
   try {
-    const status = await trpcProxyClient.mcp.stopServer.mutate();
+    const status = await trpcProxyClient.mcp.stopServer.mutate({
+      id: serverId,
+    });
     server.status = 'stopped';
     return status;
   } catch (error) {

@@ -1,5 +1,10 @@
 // Types
-import { Message, MessageTextPart, StreamTextResult } from '@/types/chat';
+import {
+  Message,
+  MessageTextPart,
+  StreamTextResult,
+  ToolExecution,
+} from '@/types/chat';
 
 // Shared
 import {
@@ -9,6 +14,11 @@ import {
 } from '@/lib/ai/core/base';
 import { trpcProxyClient } from '@/src/shared/config';
 import { tool, ToolSet, jsonSchema } from 'ai';
+
+// Extend globalThis to include our tool executions
+declare global {
+  var currentToolExecutions: ToolExecution[] | undefined;
+}
 
 // MCP Tool Info interface
 interface ToolInfo {
@@ -37,10 +47,8 @@ function convertMcpToolsToAiSdk(mcpTools: ToolInfo[]): ToolSet {
         description: mcpTool.description,
         parameters: schema,
         execute: async (params) => {
-          console.log(
-            `Executing tool: ${mcpTool.toolName} with params:`,
-            params
-          );
+          const startTime = Date.now();
+
           // Execute the MCP tool via tRPC
           try {
             const result = await trpcProxyClient.mcp.executeTool.mutate({
@@ -48,10 +56,42 @@ function convertMcpToolsToAiSdk(mcpTools: ToolInfo[]): ToolSet {
               toolName: mcpTool.toolName,
               inputs: JSON.stringify(params),
             });
-            console.log(`Tool ${mcpTool.toolName} execution result:`, result);
+            const endTime = Date.now();
+
+            // Store tool execution details for UI display
+            const toolExecution: ToolExecution = {
+              toolName: mcpTool.toolName,
+              parameters: params,
+              result: result,
+              timestamp: startTime,
+              duration: endTime - startTime,
+            };
+
+            // Store tool execution for UI display
+            if (!globalThis.currentToolExecutions) {
+              globalThis.currentToolExecutions = [];
+            }
+            globalThis.currentToolExecutions.push(toolExecution);
+
             return result;
           } catch (error) {
-            console.error(`Error executing tool ${mcpTool.toolName}:`, error);
+            const endTime = Date.now();
+
+            // Store failed tool execution
+            const toolExecution: ToolExecution = {
+              toolName: mcpTool.toolName,
+              parameters: params,
+              result: null,
+              timestamp: startTime,
+              duration: endTime - startTime,
+              error: error instanceof Error ? error.message : String(error),
+            };
+
+            if (!globalThis.currentToolExecutions) {
+              globalThis.currentToolExecutions = [];
+            }
+            globalThis.currentToolExecutions.push(toolExecution);
+
             throw error;
           }
         },
@@ -119,28 +159,31 @@ export async function streamText(
   const aiSdkTools = convertMcpToolsToAiSdk(mcpTools);
 
   try {
+    // Initialize tool executions for this conversation
+    globalThis.currentToolExecutions = [];
+
     params.onResultChangeWithCancel({ cancel }); // Pass cancel method first
     const onResultChange: OnResultChange = (data) => {
-      // Log tool calls when they occur
-      if (data.toolCalls) {
-        console.log('Tool calls detected:', data.toolCalls);
-      }
-
-      // Log tool results when they are received
-      if (data.toolResults) {
-        console.log('Tool results received:', data.toolResults);
-      }
-
-      // Log content parts which may contain the AI's response to tool results
-      if (data.contentParts) {
-        console.log('Content parts received:', data.contentParts);
-      }
+      // Include tool executions in the result
+      const toolExecutions = globalThis.currentToolExecutions
+        ? [...globalThis.currentToolExecutions]
+        : undefined;
 
       result = {
         ...result,
         ...data,
+        ...(toolExecutions && toolExecutions.length > 0
+          ? { toolExecutions }
+          : {}),
       };
-      params.onResultChangeWithCancel({ ...data, cancel });
+
+      params.onResultChangeWithCancel({
+        ...data,
+        cancel,
+        ...(toolExecutions && toolExecutions.length > 0
+          ? { toolExecutions }
+          : {}),
+      });
     };
 
     result = await model.chat(params.messages, {
@@ -148,10 +191,7 @@ export async function streamText(
       onResultChange,
       tools: aiSdkTools,
     });
-
-    console.log(result);
   } catch (err) {
-    console.error(err);
     // if a cancellation is performed, do not throw an exception, otherwise the content will be overwritten.
     if (controller.signal.aborted) {
       return result;

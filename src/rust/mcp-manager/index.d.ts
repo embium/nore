@@ -11,6 +11,8 @@ export interface ServerConfig {
   command: string
   /** Arguments to pass to the command */
   args: Array<string>
+  /** Environment variables to pass to the command */
+  env?: Record<string, string>
 }
 /** Information about a tool provided by an MCP server */
 export interface ToolInfo {
@@ -57,7 +59,7 @@ export type McpManagerWrapper = McpManager
 /** NAPI wrapper for the MCP manager */
 export declare class McpManager {
   /** Create a new MCP manager wrapper */
-  constructor(eventCallback: (err: Error | null, arg: McpEvent) => any)
+  constructor(managerId: string, eventCallback: (err: Error | null, arg: McpEvent) => any)
   /** Start a new MCP server */
   start(config: ServerConfig): Promise<void>
   /** Stop an MCP server */
@@ -66,6 +68,10 @@ export declare class McpManager {
   getTools(): Array<ToolInfo>
   /** Execute a tool on an MCP server */
   executeTool(request: ToolExecutionRequest): Promise<string>
+  /** Get the manager ID */
+  getManagerId(): string
+  /** Get the current working directory of the Rust library */
+  getCurrentDir(): string
 }
 export declare namespace error_codes {
   export const SERVER_NOT_FOUND: string
@@ -74,6 +80,8 @@ export declare namespace error_codes {
   export const PROCESS_STOP_ERROR: string
   export const COMMUNICATION_ERROR: string
   export const TOOL_EXECUTION_ERROR: string
+  export const MANAGER_NOT_FOUND: string
+  export const MANAGER_SHUTDOWN: string
   export const MCP_ERROR: string
   export const UNKNOWN_ERROR: string
 }
