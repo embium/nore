@@ -45,6 +45,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { trpcProxyClient } from '@/src/shared/config';
 
 export const Route = createFileRoute('/mcp-servers/registry')({
@@ -146,10 +147,27 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
       const client = new Client();
       const details = await client.getServer(server.qualifiedName);
       console.log(details);
+
+      // Check if the server has a stdio connection type
+      const hasStdioConnection =
+        details.connections &&
+        details.connections.some(
+          (connection: any) => connection.type === 'stdio'
+        );
+
+      if (!hasStdioConnection) {
+        // Show an error toast or alert
+        toast(
+          `${details.displayName || details.name} cannot be installed because it doesn't support stdio connections.`
+        );
+        return;
+      }
+
       setSelectedServer({ ...details });
       setInstallDialogOpen(true);
     } catch (error) {
       console.error('Failed to fetch server details:', error);
+      toast('Failed to fetch server details.');
     }
   };
 
@@ -158,7 +176,6 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
 
     setIsInstalling(true);
     try {
-      console.log(selectedServer);
       installServerFromRegistry(selectedServer);
       setInstallDialogOpen(false);
     } catch (error) {

@@ -60,8 +60,6 @@ export function useAIResponseGeneration(
   const isProcessingResponseRef = useRef<boolean>(false);
   // Ref for message content to prevent state updates racing with each other
   const messageContentRef = useRef<string>('');
-  // Ref to store the current used smart hubs
-  const currentUsedSmartHubsRef = useRef<string[]>([]);
   // File content loading hook
   const { getFileContents } = useFileContent();
 
@@ -136,21 +134,20 @@ export function useAIResponseGeneration(
 
   // Function to update a message by ID - keep this stable
   const updateMessageContent = useCallback(
-    (id: string, content: string, usedSmartHubs: string[], toolExecutions?: ToolExecution[]) => {
+    (id: string, content: string, toolExecutions?: ToolExecution[]) => {
       // Update if content has changed OR if we have tool executions to add
       const contentChanged = messageContentRef.current !== content;
       const hasToolExecutions = toolExecutions && toolExecutions.length > 0;
-      
+
       if (contentChanged || hasToolExecutions) {
         if (contentChanged) {
           messageContentRef.current = content;
         }
-        
+
         // Update in chat state
         updateMessage({
           messageId: id,
           content,
-          usedSmartHubs: currentUsedSmartHubsRef.current,
           toolExecutions,
         });
       }
@@ -230,9 +227,10 @@ export function useAIResponseGeneration(
         const contextMessageLimit = selectedModelValue.contextMessageLimit || 1;
 
         const currentChatMessagesValue = currentChatMessagesRef.current;
-        const prevMessages = currentChatMessagesValue.slice(
-          Math.max(1, currentChatMessagesValue.length - contextMessageLimit)
-        );
+        const prevMessages =
+          currentChatMessagesValue.slice(-contextMessageLimit);
+
+        console.log(prevMessages);
 
         if (
           prevMessages.length > 0 &&
@@ -327,7 +325,6 @@ export function useAIResponseGeneration(
                   updateMessageContent(
                     streamingMessageIdRef.current,
                     text || '',
-                    currentUsedSmartHubsRef.current,
                     updated.toolExecutions
                   );
                 }
@@ -350,8 +347,7 @@ export function useAIResponseGeneration(
             if (streamingMessageIdRef.current) {
               updateMessageContent(
                 streamingMessageIdRef.current,
-                `⚠️ ${error}`,
-                currentUsedSmartHubsRef.current
+                `⚠️ ${error}`
               );
             }
             toast.error('Error generating a response');

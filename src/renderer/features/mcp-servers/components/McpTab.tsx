@@ -4,6 +4,7 @@ import { mcpServersState$, startServer, stopServer } from '../state';
 import { FiServer, FiPlus, FiPlay, FiSquare } from 'react-icons/fi';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
+import { useState } from 'react';
 
 const McpTabHeaderComponent: React.FC = () => {
   const navigate = useNavigate();
@@ -30,15 +31,47 @@ export const McpTabHeader = observer(McpTabHeaderComponent);
 
 const McpTabContentComponent = () => {
   const mcpServers = mcpServersState$.serversList.get();
+  
+  // Local state to track server status display
+  const [serverStatusMap, setServerStatusMap] = useState<Record<string, string>>({});
 
   const handleToggleServer = async (
     serverId: string,
     currentStatus: string
   ) => {
-    if (currentStatus === 'running') {
-      await stopServer(serverId);
-    } else {
-      await startServer(serverId);
+    // Store original status for rollback if needed
+    const originalStatus = currentStatus;
+
+    try {
+      // Optimistically update UI immediately
+      const newStatus = currentStatus === 'running' ? 'stopped' : 'running';
+      setServerStatusMap(prev => ({
+        ...prev,
+        [serverId]: newStatus
+      }));
+
+      // Make the actual API call
+      let success = false;
+      if (currentStatus === 'running') {
+        success = await stopServer(serverId);
+      } else {
+        success = await startServer(serverId);
+      }
+
+      // If the operation failed, revert to original status
+      if (!success) {
+        setServerStatusMap(prev => ({
+          ...prev,
+          [serverId]: originalStatus
+        }));
+      }
+    } catch (error) {
+      // On error, revert to original status
+      console.error('Error toggling server status:', error);
+      setServerStatusMap(prev => ({
+        ...prev,
+        [serverId]: originalStatus
+      }));
     }
   };
 
@@ -79,7 +112,7 @@ const McpTabContentComponent = () => {
                   <div className="flex items-center gap-2 overflow-hidden">
                     <Badge
                       variant="outline"
-                      className={`h-2 w-2 rounded-full p-0 ${getStatusColor(server.status)}`}
+                      className={`h-2 w-2 rounded-full p-0 ${getStatusColor(serverStatusMap[server.id] || server.status)}`}
                     />
                     <span className="truncate">
                       {server.displayName || server.name}
@@ -95,7 +128,7 @@ const McpTabContentComponent = () => {
                       handleToggleServer(server.id, server.status);
                     }}
                   >
-                    {server.status === 'running' ? (
+                    {(serverStatusMap[server.id] || server.status) === 'running' ? (
                       <FiSquare className="h-3 w-3" />
                     ) : (
                       <FiPlay className="h-3 w-3" />

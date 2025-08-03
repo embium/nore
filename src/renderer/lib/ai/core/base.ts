@@ -5,7 +5,6 @@ import {
   Message,
   MessageContentParts,
   MessageToolCalls,
-  MessageWebBrowsing,
   ToolExecution,
 } from '@/types/chat';
 
@@ -13,8 +12,6 @@ export interface ModelHelpers {
   isModelSupportVision(model: string): boolean;
   isModelSupportToolUse(model: string): boolean;
 }
-
-
 
 export interface ModelInterface {
   name: string;
@@ -87,7 +84,6 @@ export default abstract class Base implements ModelInterface {
 }
 
 export interface ResultChange {
-  webBrowsing?: MessageWebBrowsing;
   reasoningContent?: string;
   toolCalls?: MessageToolCalls;
   toolResults?: any[]; // Results from tool executions

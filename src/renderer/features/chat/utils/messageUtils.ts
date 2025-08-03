@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from '@src/types/chats';
+import { Message } from '@/types/chat';
 
 // Message role enum to use throughout the app
 export const MessageRole = {

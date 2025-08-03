@@ -29,7 +29,6 @@ import {
   MessageImagePart,
   MessageTextPart,
   MessageToolCalls,
-  MessageWebBrowsing,
   StreamTextResult,
 } from '@/types/chat';
 import { CallChatCompletionOptions, ModelInterface } from './base';
@@ -179,21 +178,10 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
       | GoogleGenerativeAIProviderMetadata
       | undefined;
     const groundingMetadata = metadata?.groundingMetadata;
-    let webBrowsing: MessageWebBrowsing | undefined;
-    if (sources && sources.length > 0) {
-      webBrowsing = {
-        query: groundingMetadata?.webSearchQueries || [],
-        links: sources.map((source) => ({
-          title: source.title || source.url,
-          url: source.url,
-        })),
-      };
-    }
     options.onResultChange?.({
       contentParts,
       reasoningContent,
       toolCalls,
-      webBrowsing,
       tokenCount: usage?.completionTokens,
       tokensUsed: usage?.totalTokens,
     });
@@ -204,36 +192,12 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
 
 async function convertContentParts<
   T extends TextPart | ImagePart | FilePart | ToolCallPart,
->(
-  contentParts: MessageContentParts,
-  imageType: 'image' | 'file'
-): Promise<T[]> {
+>(contentParts: MessageContentParts): Promise<T[]> {
   return compact(
     await Promise.all(
       contentParts.map(async (c) => {
         if (c.type === 'text') {
           return { type: 'text', text: c.text! } as T;
-        } else if (c.type === 'image') {
-          // Get the document from PouchDB
-          /*const doc = await getStorageData(c.storageKey);
-          // Access the image data - the structure depends on how you're storing it
-          // This is a common pattern for PouchDB documents
-          const imageContent =
-            typeof doc === 'object' && doc !== null
-              ? (doc as any).data || '' // Cast to any to access potential fields
-              : doc; // If the document itself is the string data
-          // Now we can safely use string methods
-          const imageData =
-            typeof imageContent === 'string'
-              ? imageContent.replace(/^data:image\/[^;]+;base64,/, '')
-              : '';
-          return {
-            type: imageType,
-            ...(imageType === 'image'
-              ? { image: imageData }
-              : { data: imageData }),
-            mimeType: 'image/png',
-          } as T;*/
         } else if (c.type === 'tool-call') {
           return {
             type: 'tool-call',
@@ -250,14 +214,14 @@ async function convertContentParts<
 
 async function convertUserContentParts(
   contentParts: MessageContentParts
-): Promise<Array<TextPart | ImagePart>> {
-  return convertContentParts<TextPart | ImagePart>(contentParts, 'image');
+): Promise<Array<TextPart>> {
+  return convertContentParts<TextPart>(contentParts);
 }
 
 async function convertAssistantContentParts(
   contentParts: MessageContentParts
-): Promise<Array<TextPart | FilePart>> {
-  return convertContentParts<TextPart | FilePart>(contentParts, 'file');
+): Promise<Array<TextPart>> {
+  return convertContentParts<TextPart>(contentParts);
 }
 
 async function convertToCoreMessages(

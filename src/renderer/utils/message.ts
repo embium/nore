@@ -3,7 +3,7 @@ import type {
   Message,
   MessageContentParts,
   MessagePicture,
-} from '@src/types/chats';
+} from '@/types/chat';
 
 export function getMessageText(
   message: Message,
@@ -145,7 +145,7 @@ export function sequenceMessages(msgs: Message[]): Message[] {
   let isFirstUserMsg = true; // Special handling for the first user message
   for (let msg of msgs) {
     // Skip the already processed system messages or empty messages
-    if (msg.role === 'system' || isEmptyMessage(msg)) {
+    if (msg.role === 'system') {
       continue;
     }
     // Merge consecutive messages from the same role
@@ -153,28 +153,11 @@ export function sequenceMessages(msgs: Message[]): Message[] {
       next = mergeMessages(next, msg);
       continue;
     }
-    // Merge all assistant messages as a quote block if constructing the first user message
-    if (isEmptyMessage(next) && isFirstUserMsg && msg.role === 'assistant') {
-      let quote =
-        getMessageText(msg)
-          .split('\n')
-          .map((line) => `> ${line}`)
-          .join('\n') + '\n';
-      msg.contentParts = [{ type: 'text', text: quote }];
-      next = mergeMessages(next, msg);
-      continue;
-    }
-    // If not the first user message, add the current message to the result and start a new one
-    if (!isEmptyMessage(next)) {
-      ret.push(next);
-      isFirstUserMsg = false;
-    }
+    ret.push(next);
+    isFirstUserMsg = false;
     next = msg;
   }
-  // Add the last message if it's not empty
-  if (!isEmptyMessage(next)) {
-    ret.push(next);
-  }
+  ret.push(next);
   // If there's only one system message, convert it to a user message
   if (ret.length === 1 && ret[0].role === 'system') {
     ret[0].role = 'user';

@@ -161,14 +161,6 @@ export interface MessagePicture {
   loading?: boolean;
 }
 
-export interface MessageWebBrowsing {
-  query: string[];
-  links: {
-    title: string;
-    url: string;
-  }[];
-}
-
 export type MessageTextPart = { type: 'text'; text: string };
 
 export type MessageImagePart = { type: 'image'; storageKey: string };
@@ -221,7 +213,6 @@ export interface Message {
   reasoningContent?: string;
   toolCalls?: MessageToolCalls;
   contentParts: MessageContentParts;
-  usedSmartHubs?: string[];
 
   errorCode?: number;
   error?: string;

@@ -62,7 +62,7 @@ function convertMcpToolsToAiSdk(mcpTools: ToolInfo[]): ToolSet {
             const toolExecution: ToolExecution = {
               toolName: mcpTool.toolName,
               parameters: params,
-              result: result,
+              result: JSON.parse(result),
               timestamp: startTime,
               duration: endTime - startTime,
             };
@@ -108,7 +108,6 @@ export async function generateText(
   model: ModelInterface,
   params: {
     messages: Message[];
-    webBrowsing?: boolean;
   }
 ): Promise<string> {
   const controller = new AbortController();
@@ -145,7 +144,6 @@ export async function streamText(
   params: {
     messages: Message[];
     onResultChangeWithCancel: onResultChangeWithCancel;
-    webBrowsing?: boolean;
   }
 ) {
   const controller = new AbortController();
