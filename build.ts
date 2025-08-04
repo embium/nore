@@ -2,6 +2,9 @@ import { build } from 'electron-builder';
 import pkg from './package.json';
 
 build({
+  linux: ['AppImage', 'deb'],
+  win: ['nsis', 'msi'],
+
   config: {
     appId: `com.${pkg.name}.app`,
     productName: pkg.name,
@@ -19,11 +22,9 @@ build({
       output: 'release/${version}',
     },
     win: {
-      target: ['nsis', 'msi'],
       icon: 'src/assets/icons/icon.png',
     },
     linux: {
-      target: ['AppImage', 'deb'],
       icon: 'src/assets/icons/icon.png',
       category: 'Office',
     },
