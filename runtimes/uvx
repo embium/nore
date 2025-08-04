@@ -9,6 +9,8 @@
 # Copyright 2021 Square, Inc. All Rights Reserved.
 
 set -euo pipefail
+DIR="$HOME/.logs/nore"
+mkdir -p "$DIR"
 LOGFILE="$HOME/.logs/nore/uvx.log"
 echo >> $LOGFILE
 
@@ -52,11 +54,33 @@ export HERMIT_STATE_DIR=~/.config/nore/hermit/cache
 log "export PATH=~/.config/nore/hermit/bin:$PATH"
 export PATH=~/.config/nore/hermit/bin:$PATH
 
-log "hermit init"
-hermit init >> "$LOGFILE"
+log "Checking for running hermit processes..."
+if pgrep -f hermit > /dev/null; then
+    log "Found running hermit processes, waiting for them to complete..."
+    sleep 5
+    if pgrep -f hermit > /dev/null; then
+        log "Hermit processes still running, attempting to continue anyway..."
+    else
+        log "Hermit processes completed"
+    fi
+fi
 
-log "chmod +x hermit"
-chmod +x ~/.config/nore/hermit/bin/hermit
+# Create a temporary copy of hermit for initialization
+log "Creating temporary copy of hermit for initialization"
+cp ~/.config/nore/hermit/bin/hermit ~/.config/nore/hermit/bin/hermit.tmp 2>> "$LOGFILE" || log "Failed to create temp copy"
+chmod +x ~/.config/nore/hermit/bin/hermit.tmp 2>> "$LOGFILE" || log "Failed to make temp copy executable"
+
+log "Running hermit init with temporary binary"
+if ~/.config/nore/hermit/bin/hermit.tmp init >> "$LOGFILE" 2>&1; then
+    log "hermit init succeeded"
+else
+    ERROR_CODE=$?
+    log "hermit init failed with exit code $ERROR_CODE. See $LOGFILE for details."
+    # Continue anyway as it might still work
+fi
+
+# Clean up temp file
+rm -f ~/.config/nore/hermit/bin/hermit.tmp 2>> "$LOGFILE" || log "Failed to remove temp copy"
 
 log "hermit install python@3.12"
 hermit install python3@3.12 >> "$LOGFILE"
