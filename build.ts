@@ -32,5 +32,8 @@ build({
       perMachine: true,
       runAfterFinish: true,
     },
+    snap: {
+      publish: 'never',
+    },
   },
 });
