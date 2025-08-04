@@ -49,13 +49,14 @@ export function useFileAttachment() {
           // Format based on file type
           if (fileType.startsWith('text/')) {
             return `[Text File: ${fileName}${fileSize}]\n${file.content}`;
-          } else if (fileName.endsWith('.pdf')) {
-            return `[PDF Document: ${fileName}${fileSize}]\n${file.content}`;
-          } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-            return `[Word Document: ${fileName}${fileSize}]\n${file.content}`;
-          } else {
-            return `[File: ${fileName}${fileSize} (${fileType})]\n${file.content}`;
           }
+          if (fileName.endsWith('.pdf')) {
+            return `[PDF Document: ${fileName}${fileSize}]\n${file.content}`;
+          }
+          if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+            return `[Word Document: ${fileName}${fileSize}]\n${file.content}`;
+          }
+          return `[File: ${fileName}${fileSize} (${fileType})]\n${file.content}`;
         })
         .join('\n\n');
       return fileAttachmentsPrompt.replace('[FILE_ATTACHMENTS]', contextParts);

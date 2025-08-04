@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 // State
-import { ModelConfig } from '@/types/ai';
+import type { ModelConfig } from '@/types/ai';
 
 interface UseModelSelectionProps {
   selectedModel: ModelConfig | null;

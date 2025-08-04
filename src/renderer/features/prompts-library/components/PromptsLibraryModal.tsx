@@ -3,7 +3,8 @@
  *
  * Renders a modal dialog with prompts library
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { observer } from '@legendapp/state/react';
 import { Plus, Search, BookmarkIcon } from 'lucide-react';
 
@@ -25,7 +26,7 @@ import { AddEditPromptForm } from './AddEditPromptForm';
 import { cn } from '@/lib/utils';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 /**
  * Props for the PromptsLibraryModal component
  */
@@ -76,7 +77,7 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
               const tagSearchParts: string[] = [];
               const textSearchPart: string[] = [];
 
-              tagParts.forEach((part) => {
+              for (const part of tagParts) {
                 if (part.includes(':')) {
                   const [prefix, value] = part.split(':');
                   if (prefix.trim() === 'tags') {
@@ -87,7 +88,7 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
                 } else {
                   tagSearchParts.push(part);
                 }
-              });
+              }
 
               // Match any of the specified tags
               const hasMatchingTag =
@@ -216,7 +217,7 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
                     )}
                     onClick={() => setActiveCategory('system')}
                   >
-                    <span className="h-2 w-2 rounded-full bg-rose-500"></span>
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
                     System
                   </button>
                   <button
@@ -228,7 +229,7 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
                     )}
                     onClick={() => setActiveCategory('user')}
                   >
-                    <span className="h-2 w-2 rounded-full bg-sky-500"></span>
+                    <span className="h-2 w-2 rounded-full bg-sky-500" />
                     User
                   </button>
                 </div>
@@ -246,6 +247,9 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
                           selectedPrompt?.id === prompt.id ? 'bg-muted' : ''
                         )}
                         onClick={() => setSelectedPrompt(prompt)}
+                        onKeyUp={() => setSelectedPrompt(prompt)}
+                        onKeyDown={() => setSelectedPrompt(prompt)}
+                        onKeyPress={() => setSelectedPrompt(prompt)}
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
@@ -256,7 +260,7 @@ const PromptsLibraryModalComponent: React.FC<PromptsLibraryModalProps> =
                                   ? 'bg-rose-500'
                                   : 'bg-sky-500'
                               )}
-                            ></span>
+                            />
                             <h3 className="font-medium truncate">
                               {prompt.name}
                             </h3>

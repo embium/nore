@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 import { Settings, Info } from 'lucide-react';
 

@@ -1,9 +1,6 @@
-import React, { useEffect } from 'react';
-import {
-  observer,
-  useObservable,
-  useObserveEffect,
-} from '@legendapp/state/react';
+import type React from 'react';
+import { useEffect } from 'react';
+import { observer } from '@legendapp/state/react';
 import { FiFile } from 'react-icons/fi';
 
 // Utils
@@ -26,7 +23,7 @@ import { useModelOperations } from '@/features/settings/hooks/useModelOperations
 import { useFileAttachment } from '../../hooks/useFileAttachment';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 import {
   enabledModels,
@@ -225,6 +222,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = observer(
                     viewBox="0 0 256 256"
                     className="h-4 w-4"
                   >
+                    <title>Send</title>
                     <path
                       fill="currentColor"
                       d="m223.87 114.52l-176-104A16 16 0 0 0 24 24v208a16 16 0 0 0 23.87 13.85l176-104a16 16 0 0 0 0-27.33"

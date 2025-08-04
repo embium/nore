@@ -16,15 +16,10 @@ export const Route = createFileRoute('/chat/')({
 });
 
 /**
- * Props for the Chat component
- */
-interface ChatProps {}
-
-/**
  * Chat component
  * Handles specific chat conversations by chatId
  */
-function ChatComponent({}: ChatProps) {
+function ChatComponent() {
   const currentChatValue = currentChat.get();
   const title = currentChatValue?.title || 'New Chat';
   //const activeChat = useObservable<Chat | null>(currentChatValue);

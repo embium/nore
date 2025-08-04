@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Trash, Pencil } from 'lucide-react';
 import { FiClipboard } from 'react-icons/fi';
 
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 interface PromptHeaderProps {
   prompt: Prompt;

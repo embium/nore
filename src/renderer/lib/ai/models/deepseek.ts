@@ -1,4 +1,4 @@
-import { ModelHelpers } from '../core/base';
+import type { ModelHelpers } from '../core/base';
 import OpenAICompatible from './openai-compatible';
 
 // https://api-docs.deepseek.com/zh-cn/quick_start/pricing

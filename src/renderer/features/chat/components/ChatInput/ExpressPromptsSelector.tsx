@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { RiChatSmileAiLine } from 'react-icons/ri';
 import { RiSearchLine } from 'react-icons/ri';
 import { BookmarkIcon } from 'lucide-react';
@@ -13,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { promptsLibraryState$ } from '@/features/prompts-library/state';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 interface ExpressPromptsSelectorProps {
   onSelectPrompt: (prompt: Prompt) => void;
@@ -48,7 +49,7 @@ const ExpressPromptsSelectorComponent: React.FC<
           const tagSearchParts: string[] = [];
           const textSearchPart: string[] = [];
 
-          tagParts.forEach((part) => {
+          for (const part of tagParts) {
             if (part.includes(':')) {
               const [prefix, value] = part.split(':');
               if (prefix.trim() === 'tags') {
@@ -59,7 +60,7 @@ const ExpressPromptsSelectorComponent: React.FC<
             } else {
               tagSearchParts.push(part);
             }
-          });
+          }
 
           // Match any of the specified tags
           const hasMatchingTag = prompt.tags.some((tag) =>
@@ -76,10 +77,8 @@ const ExpressPromptsSelectorComponent: React.FC<
             );
 
           return hasMatchingTag && matchesText;
-        } else {
-          // Regular name search
-          return prompt.name.toLowerCase().includes(searchQuery.toLowerCase());
         }
+        return prompt.name.toLowerCase().includes(searchQuery.toLowerCase());
       })
     : sortedPrompts;
 
@@ -122,6 +121,9 @@ const ExpressPromptsSelectorComponent: React.FC<
               <div
                 className="flex w-full items-center gap-2 pl-4 pr-2"
                 onClick={() => onSelectPrompt(prompt)}
+                onKeyUp={() => onSelectPrompt(prompt)}
+                onKeyDown={() => onSelectPrompt(prompt)}
+                onKeyPress={() => onSelectPrompt(prompt)}
               >
                 <div
                   className={`h-2 w-2 flex-shrink-0 rounded-full ${

@@ -1,8 +1,8 @@
 import { apiRequest } from '@/utils/request';
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { ModelMeta } from '@/features/chat/types';
+import type { ModelMeta } from '@/types/chat';
 import AbstractAISDKModel from '../core/abstract-ai-sdk';
-import { ModelHelpers } from '../core/base';
+import type { ModelHelpers } from '../core/base';
 import { ApiError } from '../core/errors';
 
 // https://docs.anthropic.com/claude/docs/models-overview
@@ -80,10 +80,10 @@ export default class Claude extends AbstractAISDKModel {
       'x-api-key': this.options.claudeApiKey,
     });
     const json: Response = await res.json();
-    if (!json['data']) {
+    if (!json.data) {
       throw new ApiError(JSON.stringify(json));
     }
-    return json['data']
+    return json.data
       .filter((item) => item.type === 'model')
       .map((item) => item.id);
   }

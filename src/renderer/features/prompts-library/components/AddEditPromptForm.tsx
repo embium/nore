@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { X, Tag as TagIcon } from 'lucide-react';
 
@@ -29,7 +30,7 @@ import { addPrompt, updatePrompt } from '../state';
 import { cn } from '@/lib/utils';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 interface AddEditPromptFormProps {
   open: boolean;
@@ -152,14 +153,14 @@ const AddEditPromptFormComponent: React.FC<AddEditPromptFormProps> = ({
                   value="user"
                   className="flex items-center gap-2"
                 >
-                  <span className="h-2 w-2 rounded-full bg-sky-500"></span>
+                  <span className="h-2 w-2 rounded-full bg-sky-500" />
                   User
                 </SelectItem>
                 <SelectItem
                   value="system"
                   className="flex items-center gap-2"
                 >
-                  <span className="h-2 w-2 rounded-full bg-rose-500"></span>
+                  <span className="h-2 w-2 rounded-full bg-rose-500" />
                   System
                 </SelectItem>
               </SelectContent>

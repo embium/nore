@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { debounce } from 'lodash';
 
 // Types
-import { Message } from '@/types/chat';
+import type { Message } from '@/types/chat';
 
 interface UseMessageListScrollResult {
   containerRef: React.RefObject<HTMLDivElement>;

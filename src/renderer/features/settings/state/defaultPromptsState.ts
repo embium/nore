@@ -2,14 +2,15 @@ import { observable } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 
 // Types
-import { DefaultPrompts } from '@/types/defaultPrompts';
+import type { DefaultPrompts } from '@/types/defaultPrompts';
 
 // Initialize with default values
 const defaultSystemPrompt = `You are an AI assistant helping the user with their notes and ideas.
 Be concise, helpful, and suggest connections between topics when appropriate.
 Prioritize clarity and accuracy in your responses.`;
 
-const defaultTitlePrompt = `Generate a concise and descriptive title for the following chat. The title should only contain 3-6 short words and reflect the main topic or purpose of the initial chat message. Do not provide any punctuation or other formatting.`;
+const defaultTitlePrompt =
+  'Generate a concise and descriptive title for the following chat. The title should only contain 3-6 short words and reflect the main topic or purpose of the initial chat message. Do not provide any punctuation or other formatting.';
 
 const defaultFileAttachmentsPrompt = `My request may include attached file(s). These files are important and likely the primary subject or essential context for the task I need you to perform. Please follow these guidelines:
 

@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useObservable } from '@legendapp/state/react';
 
+// Types
+import type { Chat } from '../state';
+
 // State
-import { Chat, currentChat } from '../state';
+import { currentChat } from '../state';
 
 interface UseChatSwitchingResult {
   activeChat: ReturnType<typeof useObservable<Chat | null>>;

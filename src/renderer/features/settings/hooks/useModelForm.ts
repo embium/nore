@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 
 // Types
-import { ModelConfig, ProviderType } from '@/types/ai';
+import type { ModelConfig, ProviderType } from '@/types/ai';
 
 // Utils
 import { validateJsonString } from '../utils/modelUtils';

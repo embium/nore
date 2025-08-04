@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { ChevronDown, ChevronUp, BrainIcon, Loader2 } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { Message } from '@/types/chat';
+import type { Message } from '@/types/chat';
 
 // Components
 import MarkdownRenderer from '@/components/markdown';
@@ -50,7 +51,7 @@ const MessageContentComponent: React.FC<MessageContentProps> = ({
           const reasoningMatch = part.match(/__REASONING_(\d+)__/);
 
           if (reasoningMatch) {
-            const reasoningIndex = parseInt(reasoningMatch[1], 10);
+            const reasoningIndex = Number.parseInt(reasoningMatch[1], 10);
             const reasoningData = reasoningSections[reasoningIndex];
             const isExpanded = expandedReasonings.includes(reasoningIndex);
 

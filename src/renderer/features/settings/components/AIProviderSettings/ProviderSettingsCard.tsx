@@ -9,7 +9,8 @@ import {
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { ProviderType } from '@/types/ai';
+import type { ProviderType } from '@/types/ai';
+import type { LoadingStatus } from '@/features/settings/hooks/useProviderConfig';
 
 // UI Components
 import {
@@ -29,9 +30,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import CustomSwitch from '@/components/ui/custom-switch';
-
-// Hooks
-import { LoadingStatus } from '@/features/settings/hooks/useProviderConfig';
 
 // Utils
 import { cn } from '@/lib/utils';
@@ -208,7 +206,10 @@ const ProviderSettingsCardComponent = ({
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
+                            aria-hidden="false"
+                            role="img"
                           >
+                            <title>Success check mark</title>
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"

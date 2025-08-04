@@ -38,10 +38,9 @@ export function convertCommand(command: string) {
     if (app.isPackaged) {
       // In production, files are in extraResources
       return process.resourcesPath;
-    } else {
-      // In development, use the project root
-      return join(__dirname, '../..');
     }
+    // In development, use the project root
+    return join(__dirname, '../..');
   };
 
   const resourcePath = getResourcePath();

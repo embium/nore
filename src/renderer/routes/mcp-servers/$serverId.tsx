@@ -36,15 +36,10 @@ export const Route = createFileRoute('/mcp-servers/$serverId')({
 });
 
 /**
- * Props for the MCP Server Config component
- */
-interface McpServerConfigProps {}
-
-/**
  * MCP Server Config component
  * Handles configuration of individual MCP servers
  */
-function McpServerConfigComponent({}: McpServerConfigProps) {
+function McpServerConfigComponent() {
   const { serverId } = Route.useParams();
   const navigate = useNavigate();
   const server = getServerById(serverId);
@@ -60,7 +55,7 @@ function McpServerConfigComponent({}: McpServerConfigProps) {
     if (server) {
       const fullCommand =
         server.command +
-        (server.args.length > 0 ? ' ' + server.args.join(' ') : '');
+        (server.args.length > 0 ? ` ${server.args.join(' ')}` : '');
       setCommand(fullCommand);
 
       const envEntries = Object.entries(server.env || {}).map(
@@ -97,11 +92,11 @@ function McpServerConfigComponent({}: McpServerConfigProps) {
     const newArgs = parts.slice(1);
 
     const newEnv: Record<string, string> = {};
-    envVars.forEach(({ key, value }) => {
+    for (const { key, value } of envVars) {
       if (key.trim() && value.trim()) {
         newEnv[key.trim()] = value.trim();
       }
-    });
+    }
 
     updateServer(serverId, {
       command: newCommand,
@@ -275,7 +270,7 @@ function McpServerConfigComponent({}: McpServerConfigProps) {
                 // Reset form
                 const fullCommand =
                   server.command +
-                  (server.args.length > 0 ? ' ' + server.args.join(' ') : '');
+                  (server.args.length > 0 ? ` ${server.args.join(' ')}` : '');
                 setCommand(fullCommand);
                 const envEntries = Object.entries(server.env || {}).map(
                   ([key, value]) => ({ key, value })

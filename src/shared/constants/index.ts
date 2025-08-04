@@ -2,8 +2,8 @@
 export const APP_NAME = 'Nore';
 export const APP_VERSION = '1.0.0';
 
-import { ProviderConfig, ProviderType } from '@/types/ai';
-import { PromptType } from '@/types/defaultPrompts';
+import type { ProviderConfig, ProviderType } from '@/types/ai';
+import type { PromptType } from '@/types/defaultPrompts';
 
 export enum ContextWindowSize {
   t16k = 16384,

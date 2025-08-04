@@ -5,7 +5,6 @@
  */
 
 // Models
-import { ModelInterface } from '@/lib/ai/core/base';
 import Ollama from '@/lib/ai/models/ollama';
 import Gemini from '@/lib/ai/models/gemini';
 import OpenAI from '@/lib/ai/models/openai';
@@ -14,20 +13,22 @@ import Groq from '@/lib/ai/models/groq';
 import LMStudio from '@/lib/ai/models/lmstudio';
 import Perplexity from '@/lib/ai/models/perplexity';
 import XAI from '@/lib/ai/models/xai';
+import DeepSeek from '@/lib/ai/models/deepseek';
+import TogetherAI from '@/lib/ai/models/togetherai';
+import OpenRouter from '@/src/renderer/lib/ai/models/openrouter';
 
 // State
 import { getProviderConfig } from '../aiProviders/providerConfigs';
 
 // Types
 import {
-  ProviderType,
-  ProviderConfig,
-  ModelConfig,
+  type ProviderType,
+  type ProviderConfig,
+  type ModelConfig,
   PROVIDER_CONFIG_MAP,
 } from '@/types/ai';
-import DeepSeek from '@/lib/ai/models/deepseek';
-import TogetherAI from '@/lib/ai/models/togetherai';
-import OpenRouter from '@/src/renderer/lib/ai/models/openrouter';
+import type { ModelInterface } from '@/lib/ai/core/base';
+import type { GeminiModel } from '@/lib/ai/models/gemini';
 
 /**
  * Initialize a model class based on provider type and configuration
@@ -37,17 +38,27 @@ export function initializeModelClass(
   providerId: ProviderType,
   providerConfig: ProviderConfig,
   modelId: string,
-  params: Record<string, any> = {}
+  params: Record<string, unknown> = {}
 ): ModelInterface {
   // Base parameters with defaults
   const baseParams = {
-    maxTokens: params.maxTokens || 2048,
-    temperature: params.temperature || 0.7,
-    topP: params.topP || 0.9,
-    frequencyPenalty: params.frequencyPenalty || 0.5,
-    presencePenalty: params.presencePenalty || 0.5,
-    contextMessageLimit: params.contextMessageLimit || 10,
-    ...params.extraParameters,
+    maxTokens: typeof params.maxTokens === 'number' ? params.maxTokens : 2048,
+    temperature:
+      typeof params.temperature === 'number' ? params.temperature : 0.7,
+    topP: typeof params.topP === 'number' ? params.topP : 0.9,
+    frequencyPenalty:
+      typeof params.frequencyPenalty === 'number'
+        ? params.frequencyPenalty
+        : 0.5,
+    presencePenalty:
+      typeof params.presencePenalty === 'number' ? params.presencePenalty : 0.5,
+    contextMessageLimit:
+      typeof params.contextMessageLimit === 'number'
+        ? params.contextMessageLimit
+        : 10,
+    ...(params.extraParameters && typeof params.extraParameters === 'object'
+      ? (params.extraParameters as Record<string, unknown>)
+      : {}),
   };
 
   // Create model instances with appropriate parameters
@@ -62,7 +73,7 @@ export function initializeModelClass(
       return new Gemini({
         geminiAPIKey: providerConfig.apiKey || '',
         geminiAPIHost: providerConfig.apiHost,
-        geminiModel: modelId as any, // Type assertion needed due to strict typing
+        geminiModel: modelId as GeminiModel, // Type assertion to the correct GeminiModel type
         ...baseParams,
       });
     case 'OpenAI':
@@ -183,10 +194,12 @@ export async function fetchModelsFromProvider(
 
       // For Gemini models, process them differently
       if (providerId === 'Google Gemini') {
-        return models.map((model: any) => ({
-          ...model,
-          name: model.name.replace('models/', ''), // Clean up the name for display
-        }));
+        return models.map(
+          (model: { name: string; [key: string]: unknown }) => ({
+            ...model,
+            name: model.name.replace('models/', ''), // Clean up the name for display
+          })
+        );
       }
 
       return models;
@@ -204,7 +217,7 @@ export async function fetchModelsFromProvider(
 export async function fetchAvailableModels(
   providerId: ProviderType,
   providerConfig?: ProviderConfig,
-  forceEnabled: boolean = false
+  forceEnabled = false
 ): Promise<string[] | undefined> {
   // Use the provided config or get it from the store
   const provider = providerConfig || getProviderConfig(providerId);

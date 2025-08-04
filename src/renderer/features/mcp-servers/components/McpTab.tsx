@@ -31,9 +31,11 @@ export const McpTabHeader = observer(McpTabHeaderComponent);
 
 const McpTabContentComponent = () => {
   const mcpServers = mcpServersState$.serversList.get();
-  
+
   // Local state to track server status display
-  const [serverStatusMap, setServerStatusMap] = useState<Record<string, string>>({});
+  const [serverStatusMap, setServerStatusMap] = useState<
+    Record<string, string>
+  >({});
 
   const handleToggleServer = async (
     serverId: string,
@@ -45,9 +47,9 @@ const McpTabContentComponent = () => {
     try {
       // Optimistically update UI immediately
       const newStatus = currentStatus === 'running' ? 'stopped' : 'running';
-      setServerStatusMap(prev => ({
+      setServerStatusMap((prev) => ({
         ...prev,
-        [serverId]: newStatus
+        [serverId]: newStatus,
       }));
 
       // Make the actual API call
@@ -60,17 +62,17 @@ const McpTabContentComponent = () => {
 
       // If the operation failed, revert to original status
       if (!success) {
-        setServerStatusMap(prev => ({
+        setServerStatusMap((prev) => ({
           ...prev,
-          [serverId]: originalStatus
+          [serverId]: originalStatus,
         }));
       }
     } catch (error) {
       // On error, revert to original status
       console.error('Error toggling server status:', error);
-      setServerStatusMap(prev => ({
+      setServerStatusMap((prev) => ({
         ...prev,
-        [serverId]: originalStatus
+        [serverId]: originalStatus,
       }));
     }
   };
@@ -81,7 +83,6 @@ const McpTabContentComponent = () => {
         return 'bg-green-500';
       case 'idle':
         return 'bg-yellow-500';
-      case 'stopped':
       default:
         return 'bg-gray-500';
     }
@@ -128,7 +129,8 @@ const McpTabContentComponent = () => {
                       handleToggleServer(server.id, server.status);
                     }}
                   >
-                    {(serverStatusMap[server.id] || server.status) === 'running' ? (
+                    {(serverStatusMap[server.id] || server.status) ===
+                    'running' ? (
                       <FiSquare className="h-3 w-3" />
                     ) : (
                       <FiPlay className="h-3 w-3" />

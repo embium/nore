@@ -3,7 +3,7 @@
  * Route for browsing and installing MCP servers from the Smithery registry
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { observer } from '@legendapp/state/react';
 import {
@@ -22,6 +22,8 @@ import {
   installServerFromRegistry,
   setLoadingRegistry,
 } from '@/features/mcp-servers/state';
+
+import type { RegistryServer } from '@/features/mcp-servers/state';
 
 // Utils
 import { Client } from '@/lib/smithery/client';
@@ -53,20 +55,17 @@ export const Route = createFileRoute('/mcp-servers/registry')({
 });
 
 /**
- * Props for the MCP Servers Registry component
- */
-interface McpServersRegistryProps {}
-
-/**
  * MCP Servers Registry component
  * Handles browsing and installing servers from the Smithery registry
  */
-function McpServersRegistryComponent({}: McpServersRegistryProps) {
-  const [registryServers, setRegistryServers] = useState<any[]>([]);
-  const [filteredServers, setFilteredServers] = useState<any[]>([]);
+function McpServersRegistryComponent() {
+  const [registryServers, setRegistryServers] = useState<RegistryServer[]>([]);
+  const [filteredServers, setFilteredServers] = useState<RegistryServer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedServer, setSelectedServer] = useState<any>(null);
+  const [selectedServer, setSelectedServer] = useState<RegistryServer | null>(
+    null
+  );
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
 
@@ -113,8 +112,7 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
         const filtered = registryServers.filter(
           (server) =>
             server.qualifiedName.toLowerCase().includes(query) ||
-            (server.description &&
-              server.description.toLowerCase().includes(query))
+            server.description?.toLowerCase().includes(query)
         );
         setFilteredServers(filtered);
       } finally {
@@ -130,7 +128,10 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, registryServers]);
 
-  const handleServerClick = (event: React.MouseEvent, server: any) => {
+  const handleServerClick = (
+    event: React.MouseEvent,
+    server: RegistryServer
+  ) => {
     // If the click was on the install button, don't open external link
     if ((event.target as HTMLElement).closest('button')) {
       return;
@@ -139,21 +140,18 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
     trpcProxyClient.mcp.openLink.query({ url: server.homepage });
   };
 
-  const handleInstallClick = async (server: any) => {
+  const handleInstallClick = async (server: RegistryServer) => {
     setSelectedServer(server);
 
     try {
       // Fetch detailed server info
       const client = new Client();
       const details = await client.getServer(server.qualifiedName);
-      console.log(details);
 
       // Check if the server has a stdio connection type
-      const hasStdioConnection =
-        details.connections &&
-        details.connections.some(
-          (connection: any) => connection.type === 'stdio'
-        );
+      const hasStdioConnection = details.connections?.some(
+        (connection: { type: string }) => connection.type === 'stdio'
+      );
 
       if (!hasStdioConnection) {
         // Show an error toast or alert
@@ -242,33 +240,18 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredServers.map((server) => (
               <Card
-                key={server.name}
+                key={server.displayName}
                 className="relative cursor-pointer hover:shadow-md transition-shadow"
                 onClick={(e) => handleServerClick(e, server)}
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-stavrt justify-between">
                     <div className="flex items-center gap-3">
-                      {server.iconUrl && (
-                        <img
-                          src={server.iconUrl}
-                          alt={server.name}
-                          className="h-8 w-8 rounded"
-                        />
-                      )}
                       <div>
                         <CardTitle className="text-base flex items-center gap-2">
-                          {server.displayName || server.name}
+                          {server.displayName}
                           <FiExternalLink className="h-3 w-3 text-muted-foreground" />
                         </CardTitle>
-                        {server.version && (
-                          <Badge
-                            variant="outline"
-                            className="mt-1"
-                          >
-                            v{server.version}
-                          </Badge>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -306,8 +289,7 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
           <DialogHeader>
             <DialogTitle>Install MCP Server</DialogTitle>
             <DialogDescription>
-              Are you sure you want to install{' '}
-              {selectedServer?.displayName || selectedServer?.name}?
+              Are you sure you want to install {selectedServer?.displayName}?
             </DialogDescription>
           </DialogHeader>
 
@@ -317,20 +299,6 @@ function McpServersRegistryComponent({}: McpServersRegistryProps) {
                 {selectedServer.description && (
                   <p className="text-sm">{selectedServer.description}</p>
                 )}
-                <div className="flex flex-col gap-2 text-sm">
-                  {selectedServer.version && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Version:</span>
-                      <span>{selectedServer.version}</span>
-                    </div>
-                  )}
-                  {selectedServer.author && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Author:</span>
-                      <span>{selectedServer.author}</span>
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           )}

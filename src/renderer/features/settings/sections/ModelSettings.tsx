@@ -1,10 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 import { AlertCircle } from 'lucide-react';
 
 // Types
-import { ProviderType } from '@/types/ai';
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { ProviderType } from '@/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
 // Components
 import { ModelList } from '../components/ModelSettings/ModelList';

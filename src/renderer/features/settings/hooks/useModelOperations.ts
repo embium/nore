@@ -3,7 +3,7 @@ import { useObservable, useObserve } from '@legendapp/state/react';
 import { toast } from 'sonner';
 
 // Types
-import { ModelConfig, ProviderType } from '@/types/ai';
+import type { ModelConfig, ProviderType } from '@/types/ai';
 
 // State
 import { getAllModels } from '../state/aiSettings/aiModels/modelOperations';
@@ -85,13 +85,27 @@ export function useModelOperations(providerId: ProviderType) {
   const handleCreateOrUpdateModel = useCallback(
     (editingModelId: string | null, modelData: Partial<ModelConfig>) => {
       try {
+        // Get current models with proper typing
+        const currentModels = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+        
         if (editingModelId) {
           // Update existing model
+          const existingModel = currentModels[editingModelId];
+          if (!existingModel) {
+            throw new Error(`Model ${editingModelId} not found`);
+          }
+          
+          // Create updated model
           const updatedModel = {
-            ...aiSettingsState$.models[editingModelId].get(),
+            ...existingModel,
             ...modelData,
           };
-          aiSettingsState$.models[editingModelId].set(updatedModel);
+          
+          // Update models record
+          aiSettingsState$.models.set({
+            ...currentModels,
+            [editingModelId]: updatedModel
+          });
         } else {
           // Create a new model
           if (!modelData.providerId || !modelData.name) {
@@ -117,8 +131,11 @@ export function useModelOperations(providerId: ProviderType) {
             isCustom: true,
           };
 
-          // Directly manipulate the observable state
-          aiSettingsState$.models[modelId].set(newModel);
+          // Update models record with new model
+          aiSettingsState$.models.set({
+            ...currentModels,
+            [modelId]: newModel
+          });
         }
       } catch (error) {
         console.error('Error creating/updating model:', error);
@@ -135,8 +152,22 @@ export function useModelOperations(providerId: ProviderType) {
    */
   const handleToggleModel = useCallback((modelId: string, enabled: boolean) => {
     try {
-      // Directly set the enabled property in the observable state
-      aiSettingsState$.models[modelId].enabled.set(enabled);
+      // Get current models with proper typing
+      const currentModels = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+      const existingModel = currentModels[modelId];
+      
+      if (!existingModel) {
+        throw new Error(`Model ${modelId} not found`);
+      }
+      
+      // Update the model with enabled state changed
+      aiSettingsState$.models.set({
+        ...currentModels,
+        [modelId]: {
+          ...existingModel,
+          enabled
+        }
+      });
     } catch (error) {
       console.error('Error toggling model:', error);
     }
@@ -154,9 +185,14 @@ export function useModelOperations(providerId: ProviderType) {
         aiSettingsState$.selectedModelId.set(null);
       }
 
-      // Use delete operator to completely remove the key from observable state
-      const models = { ...aiSettingsState$.models.get() };
+      // Get current models with proper typing
+      const currentModels = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+      
+      // Create a new models object without the model to delete
+      const models: Record<string, ModelConfig> = { ...currentModels };
       delete models[modelId];
+      
+      // Update the state
       aiSettingsState$.models.set(models);
     } catch (error) {
       console.error('Error deleting model:', error);
@@ -169,6 +205,9 @@ export function useModelOperations(providerId: ProviderType) {
   const handleCloneModel = useCallback(
     (model: ModelConfig) => {
       try {
+        // Get current models with proper typing
+        const currentModels = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+        
         const cloneName = `${model.name} (Copy)`;
         const cloneModelId = createCustomModelId(providerId, cloneName);
 
@@ -179,8 +218,11 @@ export function useModelOperations(providerId: ProviderType) {
           isCustom: true,
         };
 
-        // Directly set the new model in the observable state
-        aiSettingsState$.models[cloneModelId].set(clonedModel);
+        // Update models record with cloned model
+        aiSettingsState$.models.set({
+          ...currentModels,
+          [cloneModelId]: clonedModel
+        });
       } catch (error) {
         console.error('Error cloning model:', error);
       }

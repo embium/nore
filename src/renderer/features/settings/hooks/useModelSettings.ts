@@ -12,8 +12,8 @@ import { useModelOperations } from './useModelOperations';
 import { sortModels } from '../utils/modelUtils';
 
 // Types
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
-import { ProviderType } from '@/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { ProviderType } from '@/types/ai';
 
 /**
  * Unified hook for managing model settings

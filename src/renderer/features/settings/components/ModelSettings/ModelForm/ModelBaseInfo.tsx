@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 
 // UI Components
 import { Label } from '@/components/ui/label';
@@ -14,8 +15,8 @@ import { Separator } from '@/components/ui/separator';
 import { FiSearch, FiX } from 'react-icons/fi';
 
 // Types
-import { ModelConfig } from '@/types/ai';
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { ModelConfig } from '@/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
 // Utils
 import { cn } from '@/lib/utils';
@@ -86,7 +87,7 @@ export const ModelBaseInfo: React.FC<ModelBaseInfoProps> = ({
           <CustomSelectContent
             className="max-h-[300px]"
             searchInput={
-              <div 
+              <div
                 className="flex items-center px-2 py-2 sticky top-0 bg-popover z-10 border-b"
                 onKeyDown={(e) => {
                   // Capture ALL keyboard events to prevent type-to-select behavior

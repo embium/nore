@@ -19,6 +19,48 @@ export interface Server {
   iconUrl?: string;
 }
 
+export interface ServerTools {
+  name: string;
+  description: string;
+  inputSchema: {
+    type: string;
+    properties: {
+      [key: string]: {
+        type: string;
+        description: string;
+      };
+    };
+  };
+}
+
+export interface Connection {
+  type: string;
+  configSchema?: {
+    type: string;
+    required: string[];
+    properties: {
+      [key: string]: {
+        type: string;
+        default: string;
+        description: string;
+      };
+    };
+  };
+  exampleConfig?: {
+    type: string;
+    properties: {
+      [key: string]: {
+        type: string;
+        default: string;
+        description: string;
+      };
+    };
+  };
+  published?: boolean;
+  stdioFunction?: string;
+  deploymentUrl?: string;
+}
+
 export interface RegistryServer {
   qualifiedName: string;
   displayName: string;
@@ -29,15 +71,9 @@ export interface RegistryServer {
   security?: {
     scanPassed: boolean;
   };
-  tools?: any[];
-  connections: {
-    type: string;
-    configSchema?: any;
-    exampleConfig?: any;
-    published?: boolean;
-    stdioFunction?: string;
-    deploymentUrl?: string;
-  }[];
+  homepage: string;
+  tools?: ServerTools[];
+  connections: Connection[];
 }
 
 export interface mcpServersState$ {
@@ -74,11 +110,11 @@ export function initializeServers() {
   if (servers.length > 0) {
     return;
   }
-  servers.forEach((server) => {
+  for (const server of servers) {
     if (server.status === 'running') {
       startServer(server.id);
     }
-  });
+  }
 }
 
 // Add server
@@ -118,7 +154,6 @@ export function installServerFromRegistry(registryServer: RegistryServer) {
 
   // Parse the stdioFunction to extract command and args
   const functionBody = stdioConnection.stdioFunction;
-  console.log(functionBody);
   const commandMatch = functionBody.match(/command:\s*['"]([^'"]+)['"]/);
   const argsMatch = functionBody.match(/args:\s*\[([^\]]+)\]/);
 
@@ -132,7 +167,7 @@ export function installServerFromRegistry(registryServer: RegistryServer) {
   // Split by commas but respect backticks for template literals
   const argParts = argsString.split(/,(?=(?:[^`]*`[^`]*`)*[^`]*$)/);
 
-  argParts.forEach((part) => {
+  for (const part of argParts) {
     const trimmed = part.trim();
     if (!trimmed) return;
 
@@ -152,7 +187,7 @@ export function installServerFromRegistry(registryServer: RegistryServer) {
       // Other cases (might be a variable reference)
       args.push(trimmed);
     }
-  });
+  }
 
   const newServer: Server = {
     id: uuidv4(),
@@ -166,8 +201,6 @@ export function installServerFromRegistry(registryServer: RegistryServer) {
     description: registryServer.description,
     iconUrl: registryServer.iconUrl,
   };
-
-  console.log(newServer);
 
   addServer(newServer);
   return newServer;

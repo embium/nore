@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { ProviderType } from '@/types/ai';
+import type { ProviderType } from '@/types/ai';
 
 // Utils
 import { cn } from '@/lib/utils';
@@ -40,6 +40,16 @@ const ProviderListComponent = ({
                 : 'hover:bg-muted/50'
             )}
             onClick={() => setActiveProvider(providerId)}
+            onKeyDown={(e) => {
+              // Handle Enter or Space key press
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setActiveProvider(providerId);
+              }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label={`Set ${providerId} as active provider`}
           >
             <div className="flex items-center">
               <span className="mr-2">
@@ -49,7 +59,7 @@ const ProviderListComponent = ({
             </div>
             <div className="flex items-center">
               {isProviderEnabled(providerId) && (
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               )}
               <ChevronRight
                 className={cn(

@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react';
 
 // State
-import { updateChatTitle, Chat } from '../state';
+import { updateChatTitle } from '../state';
+
+// Types
+import type { Chat } from '../state';
 
 /**
  * Custom hook for managing chat editing functionality

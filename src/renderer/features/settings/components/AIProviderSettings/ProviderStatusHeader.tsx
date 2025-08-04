@@ -12,7 +12,7 @@ import {
 import ProviderIcon from '@/components/ProviderIcons';
 
 // Types
-import { ProviderType } from '@/types/ai';
+import type { ProviderType } from '@/types/ai';
 
 interface ProviderStatusHeaderProps {
   providers: Array<{
@@ -44,6 +44,16 @@ const ProviderStatusHeaderComponent = ({
               <div
                 className="cursor-pointer flex items-center gap-1 px-2 py-1 rounded-md border text-green-500 border-green-400 bg-green-50 dark:bg-green-950/20"
                 onClick={() => setActiveProvider(provider.id)}
+                onKeyDown={(e) => {
+                  // Handle Enter or Space key press
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveProvider(provider.id);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Set ${provider.id} as active provider`}
               >
                 <ProviderIcon provider={provider.id} />
                 <span className="ml-1 text-xs text-green-500">On</span>

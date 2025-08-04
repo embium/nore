@@ -1,4 +1,6 @@
-import React from 'react';
+import type React from 'react';
+
+// UI Components
 import {
   Dialog,
   DialogContent,
@@ -8,10 +10,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ModelConfig } from '@/types/ai';
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
-// Import sub-components
+// Types
+import type { ModelConfig } from '@/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
+
+// Sub-components
 import { ModelBaseInfo } from './ModelBaseInfo';
 import { ModelBasicParams } from './ModelBasicParams';
 import { ModelAdvancedParams } from './ModelAdvancedParams';

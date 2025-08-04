@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 import { observer } from '@legendapp/state/react';
 import { FiSun, FiMoon, FiMonitor } from 'react-icons/fi';
 
@@ -6,20 +7,18 @@ import { FiSun, FiMoon, FiMonitor } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 
 // State
-import { themeState, Theme, themeActions } from '@/app/state/theme';
+import { themeState, themeActions } from '@/app/state/theme';
 
 // UI Components
 import { Button } from '@/components/ui/button';
 
-/**
- * Props for the ThemeSelector component
- */
-interface ThemeSelectorProps {}
+// Types
+import type { Theme } from '@/app/state/theme';
 
 /**
  * Component for selecting the theme appearance (light/dark/system)
  */
-const ThemeSelectorComponent: React.FC<ThemeSelectorProps> = observer(() => {
+const ThemeSelectorComponent: React.FC = observer(() => {
   // Use Legend State for theme state
   const currentTheme = themeState.theme.get();
 

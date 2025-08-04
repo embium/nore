@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { FiMessageSquare } from 'react-icons/fi';
 import { observer } from '@legendapp/state/react';
 
@@ -12,8 +12,10 @@ import {
 } from '@/components/ui/context-menu';
 
 // State
-import { Chat } from '../state';
 import { Link } from '@tanstack/react-router';
+
+// Types
+import type { Chat } from '../state';
 
 interface ChatItemProps {
   chat: Chat;
@@ -66,7 +68,6 @@ const ChatItemComponent: React.FC<ChatItemProps> = ({
               onChange={(e) => onEditTitleChange(e.target.value)}
               onKeyDown={(e) => onKeyPress(e, chat.id)}
               onBlur={() => onSaveTitle(chat.id, editTitle)}
-              autoFocus
               onClick={(e) => e.stopPropagation()}
             />
           ) : (

@@ -18,7 +18,7 @@ import { EmptyState } from './EmptyState';
 import { useMessageListScroll } from '../hooks/useMessageListScroll';
 
 // Types
-import { Message } from '@/types/chat';
+import type { Message } from '@/types/chat';
 
 interface ChatsMessageListProps {
   messages: Message[];

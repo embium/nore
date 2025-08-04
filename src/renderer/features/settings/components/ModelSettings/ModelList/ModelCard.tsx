@@ -10,7 +10,7 @@ import {
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { ModelConfig } from '@/types/ai';
+import type { ModelConfig } from '@/types/ai';
 
 // UI Components
 import { Card, CardContent, CardFooter } from '@/components/ui/card';

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { observer } from '@legendapp/state/react';
 import { useObservable } from '@legendapp/state/react';
 
@@ -16,7 +17,7 @@ import {
 } from '@/components/ui/card';
 
 // Types
-import { PromptType } from '@/types/defaultPrompts';
+import type { PromptType } from '@/types/defaultPrompts';
 
 // Constants
 import { promptTypeLabels } from '@/shared/constants';

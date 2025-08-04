@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 
 // UI Components
@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 
 // Types
-import { PromptType } from '@/types/defaultPrompts';
+import type { PromptType } from '@/types/defaultPrompts';
 
 // State
 import { promptTypeLabels } from '@/shared/constants';

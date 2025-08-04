@@ -1,7 +1,5 @@
-/**
- * AccentColorSelector component for selecting accent colors
- */
-import React, { useCallback } from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 import { FiCheck } from 'react-icons/fi';
 import { observer } from '@legendapp/state/react';
 
@@ -9,12 +7,10 @@ import { observer } from '@legendapp/state/react';
 import { cn } from '@/lib/utils';
 
 // State
-import { themeState, AccentColor, themeActions } from '@/app/state/theme';
+import { themeState, themeActions } from '@/app/state/theme';
 
-/**
- * Props for the AccentColorSelector component
- */
-interface AccentColorSelectorProps {}
+// Types
+import type { AccentColor } from '@/app/state/theme';
 
 // Define accent colors with direct background color styles
 const accentColors: { name: AccentColor; style: React.CSSProperties }[] = [
@@ -28,7 +24,7 @@ const accentColors: { name: AccentColor; style: React.CSSProperties }[] = [
 /**
  * Component for selecting accent colors
  */
-const AccentColorSelectorComponent: React.FC<AccentColorSelectorProps> = () => {
+const AccentColorSelectorComponent: React.FC = () => {
   // Use Legend State for accent color
   const currentAccentColor = themeState.accentColor.get();
 

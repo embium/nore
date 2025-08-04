@@ -58,16 +58,15 @@ async function doRequest(
 
   if (requestError) {
     throw requestError;
-  } else {
-    throw new Error('Unknown error');
   }
+  throw new Error('Unknown error');
 }
 
 export const apiRequest = {
   async post(
     url: string,
     headers: Record<string, string>,
-    body: Record<string, any>,
+    body: Record<string, unknown>,
     options?: {
       signal?: AbortSignal;
       retry?: number;

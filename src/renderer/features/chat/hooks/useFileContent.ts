@@ -4,7 +4,15 @@ import { useState, useCallback } from 'react';
 import { trpcProxyClient } from '@/shared/config';
 
 // Types
-import { FileWithPreview } from '@/types/common';
+import type { FileWithPreview } from '@/types/common';
+
+// Define interface for Electron's File object which includes path property
+interface ElectronFile {
+  path: string;
+}
+
+// Combined type for a file that might be from Electron
+type FileWithPath = File & Partial<ElectronFile>;
 
 interface UseFileContentResult {
   isLoading: boolean;
@@ -63,7 +71,7 @@ export function useFileContent(): UseFileContentResult {
         try {
           // Create a file path from the file object
           // Note: In Electron, file.file.path might be available for selected files
-          const filePath = (file.file as any).path;
+          const filePath = (file.file as FileWithPath).path;
 
           if (!filePath) {
             console.error(`No file path available for ${fileName}`);

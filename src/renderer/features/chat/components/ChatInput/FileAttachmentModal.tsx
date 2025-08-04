@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import type React from 'react';
+import { useState, useRef } from 'react';
 import { observer } from '@legendapp/state/react';
 import {
   FiFile,
@@ -19,7 +20,7 @@ import { Modal } from '@/components/ui/modal';
 import { cn } from '@/lib/utils';
 
 // Types
-import { FileWithPreview } from '@/types/common';
+import type { FileWithPreview } from '@/types/common';
 
 // Services
 import { supportedTextFileTypes } from '@/types/supportedFiles';
@@ -206,6 +207,9 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                       <div
                         className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded-sm"
                         onClick={selectAllFiles}
+                        onKeyUp={selectAllFiles}
+                        onKeyDown={selectAllFiles}
+                        onKeyPress={selectAllFiles}
                       >
                         <PiSelectionPlus className="flex-shrink-0" />
                         <span className="text-sm">Select All Files</span>
@@ -213,6 +217,9 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                       <div
                         className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded-sm"
                         onClick={deselectAllFiles}
+                        onKeyUp={deselectAllFiles}
+                        onKeyDown={deselectAllFiles}
+                        onKeyPress={deselectAllFiles}
                       >
                         <PiSelectionSlash className="flex-shrink-0" />
                         <span className="text-sm">Deselect All Files</span>
@@ -221,6 +228,9 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                       <div
                         className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded-sm text-red-500"
                         onClick={detachAllFiles}
+                        onKeyUp={detachAllFiles}
+                        onKeyDown={detachAllFiles}
+                        onKeyPress={detachAllFiles}
                       >
                         <GrDetach className="flex-shrink-0" />
                         <span className="text-sm">Remove All Files</span>
@@ -258,6 +268,9 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                                 : 'border-gray-200 dark:border-gray-700'
                             )}
                             onClick={() => toggleFileSelection(file.id)}
+                            onKeyUp={() => toggleFileSelection(file.id)}
+                            onKeyDown={() => toggleFileSelection(file.id)}
+                            onKeyPress={() => toggleFileSelection(file.id)}
                           >
                             <div className="flex items-center">
                               <div
@@ -290,6 +303,15 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                         onClick={() => {
                           fileInputRef.current?.click();
                         }}
+                        onKeyUp={() => {
+                          fileInputRef.current?.click();
+                        }}
+                        onKeyDown={() => {
+                          fileInputRef.current?.click();
+                        }}
+                        onKeyPress={() => {
+                          fileInputRef.current?.click();
+                        }}
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
                       >
@@ -302,6 +324,18 @@ const FileAttachmentModalComponent: React.FC<FileAttachmentModalProps> = ({
                 <div
                   className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 transition-colors hover:border-gray-400 dark:hover:border-gray-600 text-center cursor-pointer h-full"
                   onClick={() => {
+                    console.log('clicked empty state');
+                    fileInputRef.current?.click();
+                  }}
+                  onKeyUp={() => {
+                    console.log('clicked empty state');
+                    fileInputRef.current?.click();
+                  }}
+                  onKeyDown={() => {
+                    console.log('clicked empty state');
+                    fileInputRef.current?.click();
+                  }}
+                  onKeyPress={() => {
                     console.log('clicked empty state');
                     fileInputRef.current?.click();
                   }}

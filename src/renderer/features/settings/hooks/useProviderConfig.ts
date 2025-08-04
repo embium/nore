@@ -8,12 +8,9 @@ import {
 import { fetchAvailableModels } from '../state/aiSettings/aiModels/modelFactory';
 
 // Types
-import {
-  AVAILABLE_PROVIDERS,
-  ProviderType,
-  PROVIDER_CONFIG_MAP,
-} from '@/types/ai';
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { ProviderType } from '@/types/ai';
+import { PROVIDER_CONFIG_MAP, AVAILABLE_PROVIDERS } from '@/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
 /**
  * Status for model loading operations
@@ -270,6 +267,7 @@ export function useProviderConfig() {
       LMStudio: 'https://lmstudio.ai/docs',
       Perplexity: 'https://docs.perplexity.ai/',
       xAI: 'https://platform.x.ai/docs',
+      OpenRouter: 'https://openrouter.ai/docs',
     };
     return urls[providerId] || '#';
   }, []);

@@ -23,7 +23,8 @@ import { useChatEditing } from '../hooks/useChatEditing';
 import { useChatActions } from '../hooks/useChatActions';
 
 // State
-import { Chat, chatState$, createChat } from '../state';
+import type { Chat } from '../state';
+import { chatState$, createChat } from '../state';
 
 /**
  * Header component for the chats tab
@@ -138,7 +139,7 @@ const ChatTabContentComponent: React.FC = () => {
           >
             {isLoading ? (
               <div className="flex justify-center items-center h-20">
-                <span className="animate-spin h-5 w-5 border-2 border-gray-500 rounded-full border-t-transparent"></span>
+                <span className="animate-spin h-5 w-5 border-2 border-gray-500 rounded-full border-t-transparent" />
               </div>
             ) : hasChats ? (
               <div className="flex flex-col gap-1">

@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // Types
-import { GeminiModelInfo } from '@src/renderer/lib/ai/models/gemini';
-import { ProviderType } from '@src/types/ai';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { ProviderType } from '@/types/ai';
 
 /**
  * Create a custom model ID based on provider and name
@@ -20,14 +20,14 @@ export function createCustomModelId(
 export function extractVersionNumber(modelName: string): number {
   // Match patterns like "1.0", "1.5", "2.5", etc.
   const versionMatch = modelName.match(/(\d+\.\d+)/);
-  if (versionMatch && versionMatch[1]) {
-    return parseFloat(versionMatch[1]);
+  if (versionMatch?.[1]) {
+    return Number.parseFloat(versionMatch[1]);
   }
 
   // If no decimal version found, try to match single digits
   const singleDigitMatch = modelName.match(/\b(\d+)\b/);
-  if (singleDigitMatch && singleDigitMatch[1]) {
-    return parseInt(singleDigitMatch[1], 10);
+  if (singleDigitMatch?.[1]) {
+    return Number.parseInt(singleDigitMatch[1], 10);
   }
 
   return 0; // Default to 0 if no version found
@@ -94,9 +94,8 @@ export function getModelOutputTokenLimit(
 
   if (typeof selectedModel === 'string') {
     return 'Default: 2048'; // Default for Ollama models
-  } else {
-    return selectedModel.outputTokenLimit
-      ? selectedModel.outputTokenLimit.toString()
-      : 'Default: 2048';
   }
+  return selectedModel.outputTokenLimit
+    ? selectedModel.outputTokenLimit.toString()
+    : 'Default: 2048';
 }

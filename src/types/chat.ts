@@ -2,8 +2,8 @@
  * Types related to chat functionality
  */
 
-import { GeminiModel } from '@/lib/ai/models/gemini';
-import { LanguageModelUsage } from 'ai';
+import type { GeminiModel } from '@/lib/ai/models/gemini';
+import type { LanguageModelUsage } from 'ai';
 
 export interface ModelSettings {
   aiProvider: ModelProvider;
@@ -217,7 +217,7 @@ export interface Message {
   errorCode?: number;
   error?: string;
   errorExtra?: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
   status?: (
     | {

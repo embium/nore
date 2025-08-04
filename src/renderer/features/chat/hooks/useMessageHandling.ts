@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import type { useObservable } from '@legendapp/state/react';
 
 // Utils
 import { MessageRole, createSimpleMessage } from '../utils/messageUtils';
@@ -7,7 +8,8 @@ import { MessageRole, createSimpleMessage } from '../utils/messageUtils';
 import { generateText } from '../api/generate-text';
 
 // Types
-import { MessageTextPart, Message } from '@/types/chat';
+import type { Message, MessageTextPart } from '@/types/chat';
+import type { Chat } from '../state';
 
 // State
 import { defaultPromptsState$ } from '@/features/settings/state/defaultPromptsState';
@@ -35,7 +37,7 @@ interface UseMessageHandlingResult {
 }
 
 export function useMessageHandling(
-  activeChat: any,
+  activeChat: ReturnType<typeof useObservable<Chat | null>>,
   scrollToBottom: () => void,
   setInputText: (text: string) => void,
   setError: (error: string | null) => void,
@@ -74,7 +76,12 @@ export function useMessageHandling(
         });
       }
     },
-    [selectedModelValue, activeChat]
+    [
+      selectedModelValue,
+      activeChat,
+      shouldGenerateChatTitle,
+      generateTitlePrompt,
+    ]
   );
 
   // Function to add a user message
@@ -146,8 +153,8 @@ export function useMessageHandling(
 
       // Extract the text content
       const textContent = messageToEdit.contentParts
-        .filter((part: any) => part.type === 'text')
-        .map((part: any) => part.text)
+        .filter((part): part is MessageTextPart => part.type === 'text')
+        .map((part) => part.text)
         .join('');
 
       // Set the input text to the message content
@@ -157,9 +164,9 @@ export function useMessageHandling(
       const messagesAfterEdit = currentChatValue.messages.slice(
         currentChatValue.messages.indexOf(messageToEdit)
       );
-      messagesAfterEdit.forEach((msg: Message) => {
+      for (const msg of messagesAfterEdit) {
         deleteMessage(msg.id);
-      });
+      }
 
       // Focus the input
       setTimeout(() => {
@@ -223,9 +230,9 @@ export function useMessageHandling(
       const messagesAfterResend = currentChatValue.messages.slice(
         currentChatValue.messages.indexOf(messageToResend) + 1
       );
-      messagesAfterResend.forEach((msg: Message) => {
+      for (const msg of messagesAfterResend) {
         deleteMessage(msg.id);
-      });
+      }
 
       // Directly call response generation
       generateAIResponse(messageToResend);

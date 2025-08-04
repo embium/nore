@@ -27,7 +27,7 @@ export class Client {
       `${this.url}/servers?q=${encodeURIComponent(query)}&pageSize=${pageSize}&page=${page}`,
       {
         headers: {
-          Authorization: 'Bearer ' + this.apiKey,
+          Authorization: `Bearer ${this.apiKey}`,
         },
       }
     );

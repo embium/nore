@@ -12,7 +12,7 @@ import {
 } from '../aiProviders/providerConfigs';
 
 // Types
-import { ModelConfig, ProviderType } from '@/types/ai';
+import type { ModelConfig, ProviderType } from '@/types/ai';
 
 /**
  * Get all models from state
@@ -40,7 +40,9 @@ export function getEnabledModels(): ModelConfig[] {
  * Get a model by its ID
  */
 export function getModelById(modelId: string): ModelConfig | null {
-  return aiSettingsState$.models[modelId].get() || null;
+  // Use getAllModels which already handles type safety
+  const allModels = getAllModels();
+  return allModels.find(model => model.id === modelId) || null;
 }
 
 /**
@@ -49,7 +51,10 @@ export function getModelById(modelId: string): ModelConfig | null {
 export function getSelectedModel(): ModelConfig | null {
   const selectedId = aiSettingsState$.selectedModelId.get();
   if (!selectedId) return null;
-  return aiSettingsState$.models[selectedId].get() || null;
+  
+  // Use getAllModels which already handles type safety
+  const allModels = getAllModels();
+  return allModels.find(model => model.id === selectedId) || null;
 }
 
 /**
@@ -63,7 +68,14 @@ export function setSelectedModel(modelId: string | null): void {
  * Add a model configuration
  */
 export function addModel(providerId: ProviderType, model: ModelConfig): void {
-  aiSettingsState$.models[model.id].set(model);
+  // Get current models
+  const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+  
+  // Update models with the new model
+  aiSettingsState$.models.set({
+    ...models,
+    [model.id]: model
+  });
 }
 
 /**
@@ -72,7 +84,15 @@ export function addModel(providerId: ProviderType, model: ModelConfig): void {
 export function addModelLegacy(model: ModelConfig): void {
   // Ensure ID exists
   const modelId = model.id || uuidv4();
-  aiSettingsState$.models[modelId].set({ ...model, id: modelId });
+  
+  // Get current models
+  const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+  
+  // Update models with the new model
+  aiSettingsState$.models.set({
+    ...models,
+    [modelId]: { ...model, id: modelId }
+  });
 }
 
 /**
@@ -82,16 +102,23 @@ export function updateModel(
   modelId: string,
   updates: Partial<ModelConfig>
 ): void {
-  const existingModel = aiSettingsState$.models[modelId].get();
+  // Get current models
+  const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+  const existingModel = models[modelId];
+  
   if (!existingModel) {
     console.error(`Cannot update model ${modelId} as it doesn't exist`);
     return;
   }
 
-  aiSettingsState$.models[modelId].set((prev: ModelConfig) => ({
-    ...prev,
-    ...updates,
-  }));
+  // Update the model with new values
+  aiSettingsState$.models.set({
+    ...models,
+    [modelId]: {
+      ...existingModel,
+      ...updates
+    }
+  });
 }
 
 /**
@@ -106,9 +133,14 @@ export function deleteModel(modelId: string): void {
   }
 
   try {
-    // Use delete operator to completely remove the key instead of setting to undefined
-    const models = { ...aiSettingsState$.models.get() };
+    // Get current models with proper typing
+    const currentModels = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+    
+    // Create a new models object without the model to delete
+    const models: Record<string, ModelConfig> = { ...currentModels };
     delete models[modelId];
+    
+    // Update the state
     aiSettingsState$.models.set(models);
   } catch (error) {
     console.error(`Error deleting model ${modelId}:`, error);
@@ -139,5 +171,8 @@ export const enabledModels = computed(() => {
 export const selectedModel = computed(() => {
   const selectedId = aiSettingsState$.selectedModelId.get();
   if (!selectedId) return null;
-  return aiSettingsState$.models[selectedId].get() || null;
+  
+  // Use the getAllModels function which already handles type safety
+  const allModels = getAllModels();
+  return allModels.find(model => model.id === selectedId) || null;
 });

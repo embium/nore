@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { FiServer, FiPlay, FiSquare } from 'react-icons/fi';
 import { observer } from '@legendapp/state/react';
 import { Link } from '@tanstack/react-router';
@@ -6,19 +7,12 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import CustomDropdown from '@/components/custom-dropdown/CustomDropdown';
 import CustomDropdownItem from '@/components/custom-dropdown/CustomDropdownItem';
-import { CustomSwitch } from '@/components/ui/custom-switch';
-
-// State
-import { promptsLibraryState$ } from '@/features/prompts-library/state';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
 import { mcpServersState$ } from '@/features/mcp-servers/state';
 import { startServer, stopServer } from '@/features/mcp-servers/state';
 
-interface McpServersManagerProps {}
-
-const McpServersManagerComponent: React.FC<McpServersManagerProps> = ({}) => {
+const McpServersManagerComponent: React.FC = () => {
   const mcpServers = mcpServersState$.serversList.get();
   const [pendingServers, setPendingServers] = useState<Record<string, boolean>>(
     {}
@@ -104,6 +98,9 @@ const McpServersManagerComponent: React.FC<McpServersManagerProps> = ({}) => {
                 <div
                   className="flex w-full items-center justify-between gap-2 p-2 rounded hover:bg-accent"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyUp={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  onKeyPress={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2">
                     <div

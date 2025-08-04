@@ -3,35 +3,35 @@ import {
   getMessageText,
   sequenceMessages,
 } from '@/utils/message';
-import { GoogleGenerativeAIProviderMetadata } from '@ai-sdk/google';
+import type { GoogleGenerativeAIProviderMetadata } from '@ai-sdk/google';
 
-import {
-  APICallError,
+import type {
   CoreMessage,
   CoreSystemMessage,
   FilePart,
-  experimental_generateImage as generateImage,
   ImageModel,
   ImagePart,
-  jsonSchema,
   LanguageModelV1,
-  streamText,
   TextPart,
-  tool,
   ToolCallPart,
   ToolSet,
 } from 'ai';
+
+import {
+  streamText,
+  experimental_generateImage as generateImage,
+  APICallError,
+} from 'ai';
 import dayjs from 'dayjs';
 import { compact, isEmpty } from 'lodash';
-import {
+import type {
   Message,
   MessageContentParts,
-  MessageImagePart,
   MessageTextPart,
   MessageToolCalls,
   StreamTextResult,
 } from '@/types/chat';
-import { CallChatCompletionOptions, ModelInterface } from './base';
+import type { CallChatCompletionOptions, ModelInterface } from './base';
 import { ApiError } from './errors';
 
 // ai sdk CallSettings类型的子集
@@ -67,17 +67,13 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     messages: Message[],
     options: CallChatCompletionOptions
   ): Promise<StreamTextResult> {
-    try {
-      return await this._callChatCompletion(messages, options);
-    } catch (e) {
-      throw e;
-    }
+    return await this._callChatCompletion(messages, options);
   }
 
   public async paint(
     prompt: string,
     num: number,
-    callback?: (picBase64: string) => any,
+    callback?: (picBase64: string) => unknown,
     signal?: AbortSignal
   ): Promise<string[]> {
     const imageModel = this.getImageModel();
@@ -105,14 +101,20 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
   ): Promise<StreamTextResult> {
     const model = this.getChatModel(options);
 
+    // Create a new variable instead of modifying the parameter
+    let processedMessages = [...rawMessages];
+
     if (this.injectDefaultMetadata && this.isSupportSystemMessage()) {
-      rawMessages = injectModelSystemPrompt(model.modelId, rawMessages);
+      processedMessages = injectModelSystemPrompt(
+        model.modelId,
+        processedMessages
+      );
     }
     if (!this.isSupportSystemMessage()) {
-      rawMessages = rawMessages.filter((m) => m.role !== 'system');
+      processedMessages = processedMessages.filter((m) => m.role !== 'system');
     }
 
-    const messages = sequenceMessages(rawMessages);
+    const messages = sequenceMessages(processedMessages);
     const coreMessages = await convertToCoreMessages(messages);
     const result = streamText({
       model,
@@ -198,7 +200,8 @@ async function convertContentParts<
       contentParts.map(async (c) => {
         if (c.type === 'text') {
           return { type: 'text', text: c.text! } as T;
-        } else if (c.type === 'tool-call') {
+        }
+        if (c.type === 'tool-call') {
           return {
             type: 'tool-call',
             toolCallId: c.toolCallId,
@@ -270,9 +273,10 @@ async function convertToCoreMessages(
               },
             ],
           };
-        default:
+        default: {
           const _exhaustiveCheck: never = m.role;
           throw new Error(`Unkown role: ${_exhaustiveCheck}`);
+        }
       }
     })
   );
@@ -289,11 +293,12 @@ function injectModelSystemPrompt(model: string, messages: Message[]) {
   let hasInjected = false;
   return messages.map((m) => {
     if (m.role === 'system' && !hasInjected) {
-      m = cloneMessage(m); // 复制，防止原始数据在其他地方被直接渲染使用
-      m.contentParts = [
+      const clone = cloneMessage(m); // 复制，防止原始数据在其他地方被直接渲染使用
+      clone.contentParts = [
         { type: 'text', text: metadataPrompt + getMessageText(m) },
       ];
       hasInjected = true;
+      return clone;
     }
     return m;
   });

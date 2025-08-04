@@ -1,10 +1,6 @@
-import {
-  useRef,
-  useCallback,
-  useMemo,
-  KeyboardEvent,
-  ChangeEvent,
-} from 'react';
+import { useRef, useCallback, useMemo } from 'react';
+
+import type { KeyboardEvent, ChangeEvent } from 'react';
 
 interface UseTextInputProps {
   value: string;

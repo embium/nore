@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 import { PlusCircle } from 'lucide-react';
 
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 
 // Types
-import { ProviderType } from '@/types/ai';
+import type { ProviderType } from '@/types/ai';
 
 interface ModelsHeaderProps {
   providerId: ProviderType;

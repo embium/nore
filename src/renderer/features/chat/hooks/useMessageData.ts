@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 // Types
-import { Message } from '@/types/chat';
+import type { Message, MessageTextPart } from '@/types/chat';
 
 /**
  * Custom hook for optimizing message data preparation
@@ -12,7 +12,7 @@ export function useMessageData(message: Message) {
   const { textContent, reasoningSections } = useMemo(() => {
     const fullText = message.contentParts
       .filter((part) => part.type === 'text')
-      .map((part) => (part as any).text)
+      .map((part) => (part as MessageTextPart).text)
       .join('');
 
     // Find all reasoning sections wrapped in <think> tags

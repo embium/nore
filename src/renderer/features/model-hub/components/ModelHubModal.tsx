@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { observer, useSelector } from '@legendapp/state/react';
 import {
   RefreshCw,
@@ -25,9 +26,11 @@ import { aiSettingsState$ } from '@/features/settings/state/aiSettings/aiSetting
 // Hooks
 import { useModelProgress } from '../hooks/useModelProgress';
 
+// Types
+import type { ModelInfo, ProviderConfig, ProviderType } from '@/src/types/ai';
+
 // Custom CSS to override Radix UI's hidden behavior
 import './modelHubStyles.css';
-import { ModelInfo } from '@/src/types/ai';
 
 interface ModelHubModalProps {
   visible: boolean;
@@ -38,14 +41,18 @@ const ModelHubModalComponent: React.FC<ModelHubModalProps> = ({
   visible,
   onClose,
 }) => {
-  const installedModels = useSelector(modelHubState$.installedModels);
-  const availableModels = useSelector(modelHubState$.availableModels);
-  const isLoading = useSelector(modelHubState$.isLoading);
-  const isSearching = useSelector(modelHubState$.isSearching);
-  const searchQuery = useSelector(modelHubState$.searchQuery);
-  const searchCategory = useSelector(modelHubState$.searchCategory);
-  const sortBy = useSelector(modelHubState$.sortBy);
-  const ollamaConfig = useSelector(aiSettingsState$.providers.Ollama);
+  const installedModels = modelHubState$.installedModels.get();
+  const availableModels = modelHubState$.availableModels.get();
+  const isLoading = modelHubState$.isLoading.get();
+  const isSearching = modelHubState$.isSearching.get();
+  const searchQuery = modelHubState$.searchQuery.get();
+  const searchCategory = modelHubState$.searchCategory.get();
+  const sortBy = modelHubState$.sortBy.get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  const ollamaConfig = providers.Ollama;
 
   // Subscribe to model installation progress
   useModelProgress();

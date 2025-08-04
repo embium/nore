@@ -6,7 +6,7 @@ import { persistObservable } from '@legendapp/state/persist';
 import { v4 as uuidv4 } from 'uuid';
 
 // Types
-import { Message, ToolExecution } from '@/types/chat';
+import type { Message, ToolExecution } from '@/types/chat';
 
 interface FileWithPreview {
   file: File;
@@ -126,7 +126,7 @@ export function createChat(title?: string) {
   const now = Date.now();
 
   // Create a default title if none provided
-  const chatTitle = title || `New Conversation`;
+  const chatTitle = title || 'New Conversation';
 
   // Create the new chat
   const newChat: Chat = {
@@ -307,11 +307,11 @@ export function deleteChat(chatId: string) {
   // Clean up cache for all messages in the deleted chat
   const chatToDelete = state.chatsList.find((chat) => chat.id === chatId);
   if (chatToDelete) {
-    chatToDelete.messages.forEach((msg) => {
+    for (const msg of chatToDelete.messages) {
       if (messageContentCache.has(msg.id)) {
         messageContentCache.delete(msg.id);
       }
-    });
+    }
   }
 
   batch(() => {
@@ -335,11 +335,11 @@ export function clearChat(chatId: string) {
 
   // Clean up cache for all messages in the chat
   const chatToClear = chatsList[chatIndex];
-  chatToClear.messages.forEach((msg) => {
+  for (const msg of chatToClear.messages) {
     if (messageContentCache.has(msg.id)) {
       messageContentCache.delete(msg.id);
     }
-  });
+  }
 
   const updatedChats = [...chatsList];
   updatedChats[chatIndex] = {

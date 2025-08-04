@@ -2,7 +2,7 @@ import { fetchWithProxy } from '@/utils/request';
 import { createOpenAI } from '@ai-sdk/openai';
 import { extractReasoningMiddleware, wrapLanguageModel } from 'ai';
 import AbstractAISDKModel from '../core/abstract-ai-sdk';
-import { ModelHelpers } from '../core/base';
+import type { ModelHelpers } from '../core/base';
 import { normalizeOpenAIApiHostAndPath } from '../llm_utils';
 import { fetchRemoteModels } from './openai-compatible';
 

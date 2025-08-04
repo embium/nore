@@ -1,7 +1,8 @@
-import { Settings, Config, ModelProvider } from '@/features/chat/types';
+import type { Settings, Config } from '@/types/chat';
 import Gemini from './gemini';
 import Ollama from './ollama';
 import type { ModelInterface } from '../core/base';
+import { ModelProvider } from '@/types/chat';
 
 export function getModel(setting: Settings, config: Config): ModelInterface {
   switch (setting.aiProvider) {
@@ -10,7 +11,7 @@ export function getModel(setting: Settings, config: Config): ModelInterface {
     case ModelProvider.Ollama:
       return new Ollama(setting);
     default:
-      throw new Error('Cannot find model with provider: ' + setting.aiProvider);
+      throw new Error(`Cannot find model with provider: ${setting.aiProvider}`);
   }
 }
 

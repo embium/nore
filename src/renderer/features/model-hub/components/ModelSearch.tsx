@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import { Search, X, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 

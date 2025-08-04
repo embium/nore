@@ -1,6 +1,6 @@
-import { ToolSet } from 'ai';
+import type { ToolSet } from 'ai';
 import { AIProviderNoImplementedPaintError } from './errors';
-import {
+import type {
   StreamTextResult,
   Message,
   MessageContentParts,
@@ -24,7 +24,7 @@ export interface ModelInterface {
   paint: (
     prompt: string,
     num: number,
-    callback?: (picBase64: string) => any,
+    callback?: (picBase64: string) => unknown,
     signal?: AbortSignal
   ) => Promise<string[]>;
 }
@@ -65,7 +65,7 @@ export default abstract class Base implements ModelInterface {
   public async paint(
     prompt: string,
     num: number,
-    callback?: (picBase64: string) => any,
+    callback?: (picBase64: string) => unknown,
     signal?: AbortSignal
   ): Promise<string[]> {
     const concurrence: Promise<string>[] = [];
@@ -86,7 +86,7 @@ export default abstract class Base implements ModelInterface {
 export interface ResultChange {
   reasoningContent?: string;
   toolCalls?: MessageToolCalls;
-  toolResults?: any[]; // Results from tool executions
+  toolResults?: unknown[]; // Results from tool executions
   contentParts?: MessageContentParts;
   tokenCount?: number;
   tokensUsed?: number;

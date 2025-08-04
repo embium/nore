@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 // Types
-import { Message } from '@/types/chat';
+import type { Message } from '@/types/chat';
 
 // Utils
 import { cn } from '@/lib/utils';
@@ -32,16 +32,27 @@ const MessageItem: React.FC<MessageItemProps> = ({
   const { textContent, messageRoleInfo } = useMessageData(message);
   const { isUserMessage, displayName, roleClass, model } = messageRoleInfo;
 
-  const handleSelectedText = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const selection = window.getSelection();
-      if (selection && selection.toString()) {
-        onSelectedText?.(selection.toString());
-      } else {
-        onSelectedText?.('');
+  const handleSelection = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection?.toString()) {
+      onSelectedText?.(selection.toString());
+    } else {
+      onSelectedText?.('');
+    }
+  }, [onSelectedText]);
+
+  const handleClick = useCallback(() => {
+    handleSelection();
+  }, [handleSelection]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      // Handle Space or Enter key press
+      if (event.key === 'Enter' || event.key === ' ') {
+        handleSelection();
       }
     },
-    [onSelectedText]
+    [handleSelection]
   );
 
   return (
@@ -50,7 +61,10 @@ const MessageItem: React.FC<MessageItemProps> = ({
         'message-item group py-3 px-4 hover:bg-accent/40 transition-colors select-text',
         roleClass
       )}
-      onClick={handleSelectedText}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="region"
+      aria-label={`${isUserMessage ? 'User' : 'Assistant'} message`}
     >
       <div className="flex justify-between items-start">
         <div className="message-role font-semibold text-sm text-muted-foreground mb-1">

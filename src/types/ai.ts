@@ -69,7 +69,7 @@ export interface AISettingsState {
   selectedModelId: string | null;
   providers: Record<ProviderType, ProviderConfig>;
   models: Record<string, ModelConfig>;
-  [key: string]: any; // Allow dynamic properties
+  [key: string]: unknown; // Allow dynamic properties
 }
 
 // Model configuration interface
@@ -93,7 +93,7 @@ export interface ModelConfig {
   presencePenalty?: number;
 
   // Extra parameters as object
-  extraParams?: Record<string, any>;
+  extraParams?: Record<string, unknown>;
 }
 
 // Types for embedding providers and models
@@ -141,6 +141,6 @@ export interface ModelInfo {
   capability?: string;
   pullCount?: string;
   sizes?: string[];
-  size?: string;
+  size: number;
   modified?: string;
 }

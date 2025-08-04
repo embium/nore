@@ -1,7 +1,9 @@
 import { observable } from '@legendapp/state';
-import { ModelInfo } from '@/types/ai';
 import { trpcProxyClient } from '@/shared/config/index';
 import { aiSettingsState$ } from '@/features/settings/state/aiSettings/aiSettingsState';
+
+// Types
+import type { ModelInfo, ProviderType, ProviderConfig } from '@/types/ai';
 
 /**
  * Model Hub State Interface
@@ -46,7 +48,11 @@ const abortControllers: Record<string, AbortController> = {};
  * Load installed models from Ollama
  */
 export async function loadInstalledModels() {
-  const ollamaConfig = aiSettingsState$.providers.Ollama.get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  const ollamaConfig = providers.Ollama;
 
   if (!ollamaConfig.enabled) {
     return;
@@ -108,7 +114,11 @@ export async function searchModels(
  * Pull a model from Ollama with optional size specification
  */
 export async function pullModel(modelName: string, size?: string) {
-  const ollamaConfig = aiSettingsState$.providers.Ollama.get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  const ollamaConfig = providers.Ollama;
 
   if (!ollamaConfig.enabled) {
     return { status: 'error', message: 'Ollama provider is not enabled' };
@@ -177,7 +187,11 @@ export async function pullModel(modelName: string, size?: string) {
  */
 export async function cancelDownload(modelName: string) {
   try {
-    const ollamaConfig = aiSettingsState$.providers.Ollama.get();
+    const providers = aiSettingsState$.providers.get() as Record<
+      ProviderType,
+      ProviderConfig
+    >;
+    const ollamaConfig = providers.Ollama;
 
     if (!ollamaConfig.enabled) {
       return { status: 'error', message: 'Ollama provider is not enabled' };
@@ -219,7 +233,11 @@ export async function cancelDownload(modelName: string) {
  * Delete a model from Ollama
  */
 export async function deleteModel(modelName: string) {
-  const ollamaConfig = aiSettingsState$.providers.Ollama.get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  const ollamaConfig = providers.Ollama;
 
   if (!ollamaConfig.enabled) {
     return { status: 'error', message: 'Ollama provider is not enabled' };

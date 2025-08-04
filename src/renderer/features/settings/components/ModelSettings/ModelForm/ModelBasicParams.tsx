@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Info } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 
@@ -15,7 +15,7 @@ import {
 import { CustomSlider } from '@/components/ui/custom-slider';
 
 // Types
-import { GeminiModelInfo } from '@/lib/ai/models/gemini';
+import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
 // Utils
 import { getModelOutputTokenLimit } from '@/features/settings/utils/modelUtils';
@@ -97,7 +97,7 @@ const ModelBasicParamsComponent: React.FC<ModelBasicParamsProps> = ({
             type="number"
             value={maxTokens}
             onChange={(e) => {
-              const value = Math.max(1, parseInt(e.target.value));
+              const value = Math.max(1, Number.parseInt(e.target.value));
               setMaxTokens(value);
             }}
             className="flex-1"
@@ -132,7 +132,10 @@ const ModelBasicParamsComponent: React.FC<ModelBasicParamsProps> = ({
               const value =
                 e.target.value === ''
                   ? 0
-                  : Math.max(1, Math.min(100, parseInt(e.target.value) || 1));
+                  : Math.max(
+                      1,
+                      Math.min(100, Number.parseInt(e.target.value) || 1)
+                    );
               setContextMessageLimit(value);
             }}
             className="flex-1"

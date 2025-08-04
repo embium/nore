@@ -1,7 +1,5 @@
-/**
- * FontSizeControl component for adjusting font size
- */
-import React, { useCallback } from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 import { FiMinus, FiPlus } from 'react-icons/fi';
 import { observer } from '@legendapp/state/react';
 
@@ -12,14 +10,9 @@ import { Button } from '@/components/ui/button';
 import { themeState, themeActions } from '@/app/state/theme';
 
 /**
- * Props for the FontSizeControl component
- */
-interface FontSizeControlProps {}
-
-/**
  * Component for controlling application font size
  */
-const FontSizeControlComponent: React.FC<FontSizeControlProps> = () => {
+const FontSizeControlComponent: React.FC = () => {
   // Use Legend State for font size
   const currentFontSize = themeState.fontSize.get();
 

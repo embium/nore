@@ -2,7 +2,7 @@ import { observable } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 
 // Types
-import { GeneralSettingsState } from '@/types/generalSettings';
+import type { GeneralSettingsState } from '@/types/generalSettings';
 
 // Create the initial state
 const initialState: GeneralSettingsState = {

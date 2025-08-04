@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { FiChevronDown } from 'react-icons/fi';
+import { observer } from '@legendapp/state/react';
 
 // UI Components
 import { CustomDropdown } from '@/components/custom-dropdown/CustomDropdown';
@@ -10,14 +11,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { ProviderIcon } from '@/components/ProviderIcons';
 
-// Types
-import { ModelConfig, ProviderType } from '@/types/ai';
-import { observer } from '@legendapp/state/react';
+// State
 import {
   getAllModels,
   getProviderConfig,
   selectedModel,
 } from '@/features/settings/state/aiSettings/aiSettingsState';
+
+// Types
+import type { ModelConfig, ProviderType } from '@/types/ai';
 
 interface ModelSelectorProps {
   onSelectModel: (model: ModelConfig) => void;
@@ -47,13 +49,13 @@ const ModelSelectorComponent: React.FC<ModelSelectorProps> = ({
     // Initialize with empty arrays for all available providers
     const grouped: Partial<Record<ProviderType, ModelConfig[]>> = {};
 
-    enabledModelsValue.forEach((model) => {
+    for (const model of enabledModelsValue) {
       const provider = model.provider as ProviderType;
       if (!grouped[provider]) {
         grouped[provider] = [];
       }
       grouped[provider]?.push(model);
-    });
+    }
 
     return grouped;
   }, [enabledModelsValue]);

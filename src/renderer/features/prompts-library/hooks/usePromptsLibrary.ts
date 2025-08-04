@@ -12,7 +12,7 @@ import {
 } from '@/features/prompts-library/state';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 /**
  * Hook for accessing and managing prompts library functionality

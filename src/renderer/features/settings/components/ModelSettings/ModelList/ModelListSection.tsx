@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 
 // Utils
@@ -31,7 +31,7 @@ const ModelListSectionComponent: React.FC<ModelListSectionProps> = ({
         >
           {title}
         </h4>
-        <div className="h-0.5 flex-1 bg-muted/30 ml-3"></div>
+        <div className="h-0.5 flex-1 bg-muted/30 ml-3" />
       </div>
       {children}
     </div>

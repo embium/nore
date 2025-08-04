@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { BsSliders } from 'react-icons/bs';
 import { Info, Settings } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
@@ -36,7 +37,7 @@ import { useModelForm } from '@/features/settings/hooks/useModelForm';
 import { selectedModel } from '@/features/settings/state/aiSettings/aiModels/modelOperations';
 
 // Types
-import { ProviderType, ModelConfig } from '@/types/ai';
+import type { ProviderType, ModelConfig } from '@/types/ai';
 
 interface ModelSettingsDialogProps {
   handleCreateOrUpdateModel: (
@@ -253,7 +254,7 @@ const ModelSettingsDialogComponent: React.FC<ModelSettingsDialogProps> = ({
                   onChange={(e) => {
                     const value = Math.max(
                       1,
-                      Math.min(8192, parseInt(e.target.value) || 0)
+                      Math.min(8192, Number.parseInt(e.target.value) || 0)
                     );
                     setMaxTokens(value);
                   }}
@@ -300,7 +301,7 @@ const ModelSettingsDialogComponent: React.FC<ModelSettingsDialogProps> = ({
                   onChange={(e) => {
                     const value = Math.max(
                       1,
-                      Math.min(100, parseInt(e.target.value) || 0)
+                      Math.min(100, Number.parseInt(e.target.value) || 0)
                     );
                     setContextMessageLimit(value);
                   }}

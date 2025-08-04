@@ -1,11 +1,9 @@
-/**
- * FontStyleSelector component for selecting font style
- */
-import React, { useCallback } from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 import { observer } from '@legendapp/state/react';
 
 // State
-import { themeState, FontStyle, themeActions } from '@/app/state/theme';
+import { themeState, themeActions } from '@/app/state/theme';
 
 // Utils
 import { cn } from '@/lib/utils';
@@ -13,15 +11,13 @@ import { cn } from '@/lib/utils';
 // UI Components
 import { Button } from '@/components/ui/button';
 
-/**
- * Props for the FontStyleSelector component
- */
-interface FontStyleSelectorProps {}
+// Types
+import type { FontStyle } from '@/app/state/theme';
 
 /**
  * Component for selecting application font style
  */
-const FontStyleSelectorComponent: React.FC<FontStyleSelectorProps> = () => {
+const FontStyleSelectorComponent: React.FC = () => {
   // Use Legend State for font style
   const currentFontStyle = themeState.fontStyle.get();
 

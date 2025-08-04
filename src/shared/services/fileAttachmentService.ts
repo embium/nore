@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 import {
   supportedTextFileTypes,
   supportedDocumentFileTypes,
@@ -6,7 +6,7 @@ import {
 import { Poppler } from 'node-poppler';
 import xlsx from 'node-xlsx';
 import WordExtractor from 'word-extractor';
-import path from 'path';
+import path from 'node:path';
 
 /**
  * Read file content as a Base64 string
@@ -117,15 +117,18 @@ export async function extractFileContent(item: {
     const fileType = item.fileName.split('.').pop()?.toLowerCase() as string;
     if (supportedTextFileTypes.includes(fileType)) {
       return await readFileAsText(item.path);
-    } else if (fileType === 'pdf') {
+    }
+    if (fileType === 'pdf') {
       return await convertPdfToText(item.path);
-    } else if (fileType === 'xlsx' || fileType === 'xls') {
+    }
+    if (fileType === 'xlsx' || fileType === 'xls') {
       const data = xlsx.parse(item.path);
       if (data.length > 0) {
-        return data[0].data.map((row: any) => row.join(',')).join('\n');
+        return data[0].data.map((row: unknown[]) => row.join(',')).join('\n');
       }
       return '';
-    } else if (supportedDocumentFileTypes.includes(fileType)) {
+    }
+    if (supportedDocumentFileTypes.includes(fileType)) {
       const extractor = new WordExtractor();
       const text = await extractor.extract(item.path);
       const body = text.getBody();

@@ -1,15 +1,12 @@
 export class BaseError extends Error {
   public code = 1;
-  constructor(message: string) {
-    super(message);
-  }
 }
 
 export class ApiError extends BaseError {
   public code = 10001;
   public responseBody: string | undefined;
   constructor(message: string, responseBody?: string) {
-    super('API Error: ' + message);
+    super(`API Error: ${message}`);
     this.responseBody = responseBody;
   }
 }
@@ -18,7 +15,7 @@ export class NetworkError extends BaseError {
   public code = 10002;
   public host: string;
   constructor(message: string, host: string) {
-    super('Network Error: ' + message);
+    super(`Network Error: ${message}`);
     this.host = host;
   }
 }

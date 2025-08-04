@@ -2,7 +2,7 @@ import { observable, computed } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 
 // Types
-import { LayoutSettings } from '@/types/layoutSettings';
+import type { LayoutSettings } from '@/types/layoutSettings';
 
 // Create the initial state
 const initialState: LayoutSettings = {

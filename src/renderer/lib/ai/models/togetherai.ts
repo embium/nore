@@ -1,11 +1,11 @@
-import { ModelHelpers } from '../core/base';
+import type { ModelHelpers } from '../core/base';
 import OpenAICompatible, { fetchRemoteModels } from './openai-compatible';
 import { apiRequest } from '@/utils/request';
 
 const helpers: ModelHelpers = {
   isModelSupportVision: (model: string) => {
-    model = model.toLowerCase();
-    return model.includes('vision') || model.includes('llava');
+    const modelLower = model.toLowerCase();
+    return modelLower.includes('vision') || modelLower.includes('llava');
   },
   isModelSupportToolUse: (model: string) => {
     return false;

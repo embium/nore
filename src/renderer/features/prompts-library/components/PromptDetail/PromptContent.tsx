@@ -1,10 +1,10 @@
-import React from 'react';
+import type React from 'react';
 
 // UI Components
 import { Badge } from '@/components/ui/badge';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 interface PromptContentProps {
   prompt: Prompt;

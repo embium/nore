@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Wrench, Clock, AlertCircle } from 'lucide-react';
-import { ToolExecution } from '@/types/chat';
+import type React from 'react';
+import { useState } from 'react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Wrench,
+  Clock,
+  AlertCircle,
+} from 'lucide-react';
+
+// Types
+import type { ToolExecution } from '@/types/chat';
 
 interface ToolExecutionsProps {
   toolExecutions: ToolExecution[];

@@ -8,7 +8,7 @@ import { persistObservable } from '@legendapp/state/persist';
 import promptsData from '@/features/prompts-library/data/prompts.json';
 
 // Types
-import { Prompt, PromptsLibraryState } from '@/types/promptsLibrary';
+import type { Prompt, PromptsLibraryState } from '@/types/promptsLibrary';
 
 // ===========================================
 // State Definition

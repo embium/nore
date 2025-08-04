@@ -1,7 +1,7 @@
 import type { inferAsyncReturnType } from '@trpc/server';
 import { BrowserWindow } from 'electron';
 import { store } from '../utils/storage';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
 /**
  * Application-wide event emitter singleton

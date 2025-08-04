@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 
 // Components
 import { LoadingState } from '../components/LoadingState';
-import { ChatHeader } from '../components/ChatHeader';
 import { ChatMessageList } from '../components/ChatMessageList';
 import { ChatInput } from '../components/ChatInput';
 
@@ -87,16 +86,15 @@ const ChatScreenComponent: React.FC<ChatsScreenProps> = ({
         selectedModelId: aiSettingsState$.selectedModelId?.get(),
       });
       return;
-    } else {
-      console.log('Using model:', {
-        name: selectedModelValue.name,
-        id: selectedModelValue.id,
-        provider: selectedModelValue.provider,
-      });
-      // If we had an error about model selection but now have a valid model, clear it
-      if (error?.includes('select an AI model')) {
-        setError(null);
-      }
+    }
+    console.log('Using model:', {
+      name: selectedModelValue.name,
+      id: selectedModelValue.id,
+      provider: selectedModelValue.provider,
+    });
+    // If we had an error about model selection but now have a valid model, clear it
+    if (error?.includes('select an AI model')) {
+      setError(null);
     }
 
     setIsInitialized(true);

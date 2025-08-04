@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import { Download, Check, Clock, Trash2 } from 'lucide-react';
 import { observer } from '@legendapp/state/react';
 
@@ -32,7 +33,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 // Types
-import { ModelInfo } from '@/types/ai';
+import type { ModelInfo } from '@/types/ai';
 
 // State
 import {
@@ -78,19 +79,19 @@ export const AvailableModelCardComponent: React.FC<ModelCardProps> = ({
 
     // Collect all installed sizes for this model
     const sizes: string[] = [];
-    installedModels.forEach((installedModel) => {
+    for (const installedModel of installedModels) {
       // Check for exact model ID match first (base model)
       if (installedModel.name === model.id) {
         sizes.push('latest');
       }
       // Then check for size-specific variants (e.g., "llama3:8b")
-      else if (installedModel.name.startsWith(model.id + ':')) {
+      else if (installedModel.name.startsWith(`${model.id}:`)) {
         const size = installedModel.name.split(':')[1];
         if (size) {
           sizes.push(size);
         }
       }
-    });
+    }
 
     setInstalledSizes(sizes);
 

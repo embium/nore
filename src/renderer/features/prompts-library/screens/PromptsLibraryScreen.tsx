@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
 import { observer } from '@legendapp/state/react';
 
 // Types
-import { Prompt } from '@/types/promptsLibrary';
+import type { Prompt } from '@/types/promptsLibrary';
 
 // Hooks
 import { usePromptDetail } from '../hooks';

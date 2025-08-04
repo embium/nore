@@ -1,8 +1,9 @@
 import { apiRequest } from '@/utils/request';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { LanguageModelV1 } from 'ai';
-import AbstractAISDKModel, { CallSettings } from '../core/abstract-ai-sdk';
-import { CallChatCompletionOptions, ModelHelpers } from '../core/base';
+import type { LanguageModelV1 } from 'ai';
+import AbstractAISDKModel from '../core/abstract-ai-sdk';
+import type { CallSettings } from '../core/abstract-ai-sdk';
+import type { CallChatCompletionOptions, ModelHelpers } from '../core/base';
 import { ApiError } from '../core/errors';
 
 export type GeminiModel = keyof typeof modelConfig;

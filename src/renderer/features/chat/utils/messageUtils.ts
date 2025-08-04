@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from '@/types/chat';
+import type { Message, MessageTextPart } from '@/types/chat';
 
 // Message role enum to use throughout the app
 export const MessageRole = {
@@ -31,6 +31,6 @@ export function createSimpleMessage(
 export function extractTextContent(message: Message): string {
   return message.contentParts
     .filter((part) => part.type === 'text')
-    .map((part) => (part as any).text)
+    .map((part) => (part as MessageTextPart).text)
     .join('');
 }

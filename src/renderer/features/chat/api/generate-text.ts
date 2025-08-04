@@ -1,19 +1,20 @@
+// Shared
+import { trpcProxyClient } from '@/src/shared/config';
+import { tool, jsonSchema } from 'ai';
+
 // Types
-import {
+import type {
+  ModelInterface,
+  OnResultChange,
+  onResultChangeWithCancel,
+} from '@/lib/ai/core/base';
+import type {
   Message,
   MessageTextPart,
   StreamTextResult,
   ToolExecution,
 } from '@/types/chat';
-
-// Shared
-import {
-  ModelInterface,
-  OnResultChange,
-  onResultChangeWithCancel,
-} from '@/lib/ai/core/base';
-import { trpcProxyClient } from '@/src/shared/config';
-import { tool, ToolSet, jsonSchema } from 'ai';
+import type { ToolSet } from 'ai';
 
 // Extend globalThis to include our tool executions
 declare global {

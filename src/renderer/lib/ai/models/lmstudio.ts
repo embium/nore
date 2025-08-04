@@ -1,10 +1,10 @@
-import { ModelHelpers } from '../core/base';
+import type { ModelHelpers } from '../core/base';
 import OpenAICompatible from './openai-compatible';
 
 const helpers: ModelHelpers = {
   isModelSupportVision: (model: string) => {
-    model = model.toLowerCase();
-    return model.includes('vision') || model.includes('llava');
+    const modelLower = model.toLowerCase();
+    return modelLower.includes('vision') || modelLower.includes('llava');
   },
   isModelSupportToolUse: (model: string) => {
     return false;
@@ -38,17 +38,18 @@ export default class LMStudio extends OpenAICompatible {
 }
 
 function normalizeApiHost(apiHost: string) {
+  let apiHostUrl = apiHost;
   if (apiHost) {
-    apiHost = apiHost.trim();
+    apiHostUrl = apiHost.trim();
   }
-  if (!apiHost.startsWith('http')) {
-    apiHost = 'http://' + apiHost;
+  if (!apiHostUrl.startsWith('http')) {
+    apiHostUrl = `http://${apiHostUrl}`;
   }
-  if (apiHost.endsWith('/')) {
-    apiHost = apiHost.slice(0, -1);
+  if (apiHostUrl.endsWith('/')) {
+    apiHostUrl = apiHostUrl.slice(0, -1);
   }
-  if (!apiHost.endsWith('/v1')) {
-    apiHost += '/v1';
+  if (!apiHostUrl.endsWith('/v1')) {
+    apiHostUrl += '/v1';
   }
-  return apiHost;
+  return apiHostUrl;
 }

@@ -3,7 +3,7 @@
  *
  * Provides methods for interacting with the Ollama API to manage models.
  */
-import { ModelInfo } from '@src/types/ai';
+import type { ModelInfo } from '@/types/ai';
 import { parse as parseHTML } from 'node-html-parser';
 
 /**
@@ -21,7 +21,7 @@ export async function fetchInstalledModels(
     }
 
     const data = await response.json();
-    return data.models.map((model: any) => ({
+    return data.models.map((model: ModelInfo) => ({
       id: model.name,
       name: model.name,
       size: formatModelSize(model.size),
@@ -38,7 +38,7 @@ export async function fetchInstalledModels(
  * Search for models on Ollama's website
  */
 export async function searchOllamaModels(
-  searchTerm: string = '',
+  searchTerm = '',
   category?: string,
   sort: 'popular' | 'newest' = 'popular'
 ): Promise<ModelInfo[]> {
@@ -260,6 +260,7 @@ function parseOllamaSearchResults(html: string): ModelInfo[] {
             const content = sizeElements[j].textContent;
             if (content) sizes.push(content.trim());
           }
+          const size = sizes[0];
 
           models.push({
             id: id.trim(),
@@ -269,6 +270,7 @@ function parseOllamaSearchResults(html: string): ModelInfo[] {
             pullCount: pullCountEl?.textContent?.trim() || '',
             modified: modifiedEl?.textContent?.trim() || '',
             sizes,
+            size: Number(size),
           });
         } catch (elementError) {
           console.error('Error parsing specific model element:', elementError);
@@ -320,7 +322,7 @@ function normalizeApiHost(apiHost: string): string {
     host = host.slice(0, -3);
   }
   if (!host.startsWith('http')) {
-    host = 'http://' + host;
+    host = `http://${host}`;
   }
   if (host === 'http://localhost:11434') {
     host = 'http://127.0.0.1:11434';

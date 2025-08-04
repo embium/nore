@@ -1,5 +1,5 @@
-import { ModelMeta } from '@/features/chat/types';
-import { ModelHelpers } from '../core/base';
+import type { ModelMeta } from '@/types/chat';
+import type { ModelHelpers } from '../core/base';
 import OpenAICompatible from './openai-compatible';
 
 const modelConfig: ModelMeta = {

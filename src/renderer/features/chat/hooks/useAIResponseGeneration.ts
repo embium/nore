@@ -7,11 +7,9 @@ import { toast } from 'sonner';
 import { streamText } from '../api/generate-text';
 
 // Utils
-import {
-  createSimpleMessage,
-  MessageRole,
-  MessageRoleType,
-} from '../utils/messageUtils';
+import { createSimpleMessage, MessageRole } from '../utils/messageUtils';
+
+import type { MessageRoleType } from '../utils/messageUtils';
 
 // State
 import { defaultPromptsState$ } from '@/features/settings/state/defaultPromptsState';
@@ -27,9 +25,13 @@ import {
 } from '../state';
 
 // Types
-import { FileWithPreview } from '@/types/common';
-import { Message, MessageTextPart, ToolExecution } from '@/types/chat';
-import { onResultChangeWithCancel, ResultChange } from '@/lib/ai/core/base';
+import type { FileWithPreview } from '@/types/common';
+import type { Message, MessageTextPart, ToolExecution } from '@/types/chat';
+import type {
+  ModelInterface,
+  onResultChangeWithCancel,
+  ResultChange,
+} from '@/lib/ai/core/base';
 
 // Hooks
 import { useFileContent } from './useFileContent';
@@ -208,7 +210,7 @@ export function useAIResponseGeneration(
         }
 
         // Attempt to create the model instance
-        let modelInstance;
+        let modelInstance: ModelInterface;
         try {
           modelInstance = createModelInstance(selectedModelValue);
           if (!modelInstance)
@@ -250,8 +252,7 @@ export function useAIResponseGeneration(
         // Create a modified system prompt that includes the smart hubs context if available
 
         if (fileAttachmentContext) {
-          userMessageContent =
-            `${fileAttachmentContext}\n\n` + userMessageContent;
+          userMessageContent = `${fileAttachmentContext}\n\n${userMessageContent}`;
         }
 
         // Create a cloned enhanced message instead of modifying the original

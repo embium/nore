@@ -1,12 +1,14 @@
-import React from 'react';
+import type React from 'react';
 import { GoSidebarCollapse } from 'react-icons/go';
 
 // State
-import { Chat } from '../state';
 import {
   layoutSettingsState$,
   setMiddlebarCollapsed,
 } from '@/features/settings/state/layoutSettingsState';
+
+// Types
+import type { Chat } from '../state';
 
 interface ChatHeaderProps {
   activeChat: Chat | null;

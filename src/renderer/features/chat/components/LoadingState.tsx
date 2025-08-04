@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -12,7 +13,7 @@ const LoadingStateComponent: React.FC = () => {
     const interval = setInterval(() => {
       setDots((prev) => {
         if (prev === '...') return '.';
-        return prev + '.';
+        return `${prev}.`;
       });
     }, 500);
 

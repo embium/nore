@@ -67,11 +67,11 @@ function AddCustomServerComponent() {
 
       // Process environment variables
       const env: Record<string, string> = {};
-      envVars.forEach(({ key, value }) => {
+      for (const { key, value } of envVars) {
         if (key.trim() && value.trim()) {
           env[key.trim()] = value.trim();
         }
-      });
+      }
 
       // Add the server
       await addServer({

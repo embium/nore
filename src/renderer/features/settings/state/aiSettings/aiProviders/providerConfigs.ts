@@ -6,7 +6,7 @@ import { observable } from '@legendapp/state';
 import { persistObservable } from '@legendapp/state/persist';
 
 // Types
-import {
+import type {
   ProviderType,
   ProviderConfig,
   AISettingsState,
@@ -14,11 +14,11 @@ import {
 } from '@/types/ai';
 import { defaultProviders } from '@/shared/constants';
 
-// Create the aiSettings state observable
+// Create the aiSettings state observable with proper typing
 export const aiSettingsState$ = observable<AISettingsState>({
   selectedModelId: null,
-  providers: defaultProviders,
-  models: {},
+  providers: defaultProviders as Record<ProviderType, ProviderConfig>,
+  models: {} as Record<string, ModelConfig>,
 });
 
 // Setup persistence for the settings
@@ -28,21 +28,43 @@ persistObservable(aiSettingsState$, {
 
 // Provider getter functions
 export function getProviderConfig(providerId: ProviderType): ProviderConfig {
-  return aiSettingsState$.providers[providerId].get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  return providers[providerId];
 }
 
 export function updateProviderConfig(
   providerId: ProviderType,
   config: Partial<ProviderConfig>
 ): void {
-  aiSettingsState$.providers[providerId].set((prev: ProviderConfig) => ({
-    ...prev,
-    ...config,
-  }));
-  const providerConfig = aiSettingsState$.providers[providerId].get();
-  const selectedModelId = aiSettingsState$.selectedModelId.get();
+  // Get current providers with proper typing
+  const currentProviders = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+
+  // Update the specific provider
+  aiSettingsState$.providers.set({
+    ...currentProviders,
+    [providerId]: {
+      ...currentProviders[providerId],
+      ...config,
+    },
+  });
+
+  // Get updated provider config
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  const providerConfig = providers[providerId];
+  const selectedModelId = aiSettingsState$.selectedModelId.get() as string | null;
+
   if (selectedModelId) {
-    const selectedModel = aiSettingsState$.models[selectedModelId].get();
+    const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
+    const selectedModel = models[selectedModelId];
     if (!providerConfig.enabled) {
       console.log('Provider disabled, unselecting model');
       if (selectedModel?.provider === providerId) {
@@ -51,21 +73,33 @@ export function updateProviderConfig(
       }
     }
   }
-  const models = aiSettingsState$.models.get();
+  const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
   if (models && typeof models === 'object') {
-    (Object.values(models) as ModelConfig[]).forEach((model: ModelConfig) => {
-      if (model.provider === providerId) {
-        model.enabled = false;
+    // Create a new models object with updated values
+    const updatedModels = { ...models };
+
+    for (const modelId in models) {
+      if (models[modelId].provider === providerId) {
+        updatedModels[modelId] = {
+          ...models[modelId],
+          enabled: false,
+        };
       }
-    });
+    }
+
+    // Update the models state with the new object
+    aiSettingsState$.models.set(updatedModels);
   }
 }
 
 export function getEnabledProviders(): ProviderConfig[] {
-  const providers = aiSettingsState$.providers.get();
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
   return Object.values(providers).filter(
-    (provider) => (provider as ProviderConfig).enabled
-  ) as ProviderConfig[];
+    (provider: ProviderConfig) => provider.enabled
+  );
 }
 
 // Helper function to get the embedding provider type from a provider type
