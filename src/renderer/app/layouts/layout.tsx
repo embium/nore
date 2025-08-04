@@ -48,7 +48,7 @@ export function Layout({ children }: LayoutProps) {
         >
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-              Notebit
+              Nore
             </span>
           </div>
         </div>

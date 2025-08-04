@@ -82,7 +82,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = observer(() => {
       <div className="flex flex-col h-[60px] border-b items-center justify-center">
         <img
           src={iconPng}
-          alt="Notebit"
+          alt="Nore"
           className="h-8 w-8"
         />
       </div>

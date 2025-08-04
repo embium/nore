@@ -91,7 +91,7 @@ const SettingsModal: React.FC<SettingsModalProps> = React.memo(
       return (
         <div className="p-3 mt-auto text-center border-t border-border">
           <span className="text-xs text-muted-foreground opacity-70">
-            NoteBit v1.0.0
+            Nore v1.0.0
           </span>
         </div>
       );

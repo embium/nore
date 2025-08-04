@@ -40,5 +40,5 @@ export const defaultPromptsState$ = observable<DefaultPrompts>({
 
 // Configure persistence
 persistObservable(defaultPromptsState$, {
-  local: 'notebit-default-prompts',
+  local: 'default-prompts',
 });
