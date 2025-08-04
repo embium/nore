@@ -14,7 +14,7 @@
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev -w",
-    "prebuild": "electron-vite build",
+    "prebuild": "pnpm --filter @nore/mcp-manager build && electron-vite build",
     "build": "npx tsx build.ts"
   },
   "workspaces": [
