@@ -83,10 +83,56 @@ fi
 rm -f ~/.config/nore/hermit/bin/hermit.tmp 2>> "$LOGFILE" || log "Failed to remove temp copy"
 
 log "hermit install python@3.12"
-hermit install python3@3.12 >> "$LOGFILE"
+
+# Check for running hermit processes again
+log "Checking for running hermit processes before python install..."
+if pgrep -f hermit > /dev/null; then
+    log "Found running hermit processes, waiting for them to complete..."
+    sleep 5
+fi
+
+# Create another temporary copy of hermit for python installation
+log "Creating temporary copy of hermit for python installation"
+cp ~/.config/nore/hermit/bin/hermit ~/.config/nore/hermit/bin/hermit.python.tmp 2>> "$LOGFILE" || log "Failed to create temp copy for python install"
+chmod +x ~/.config/nore/hermit/bin/hermit.python.tmp 2>> "$LOGFILE" || log "Failed to make python temp copy executable"
+
+log "Running hermit install python with temporary binary"
+if ~/.config/nore/hermit/bin/hermit.python.tmp install python3@3.12 >> "$LOGFILE" 2>&1; then
+    log "hermit install python succeeded"
+else
+    ERROR_CODE=$?
+    log "hermit install python failed with exit code $ERROR_CODE. See $LOGFILE for details."
+    # Continue anyway as python might still work with system python
+fi
+
+# Clean up temp file
+rm -f ~/.config/nore/hermit/bin/hermit.python.tmp 2>> "$LOGFILE" || log "Failed to remove python temp copy"
 
 log "hermit install uv"
-hermit install uv >> "$LOGFILE"
+
+# Check for running hermit processes again
+log "Checking for running hermit processes before uv install..."
+if pgrep -f hermit > /dev/null; then
+    log "Found running hermit processes, waiting for them to complete..."
+    sleep 5
+fi
+
+# Create another temporary copy of hermit for uv installation
+log "Creating temporary copy of hermit for uv installation"
+cp ~/.config/nore/hermit/bin/hermit ~/.config/nore/hermit/bin/hermit.uv.tmp 2>> "$LOGFILE" || log "Failed to create temp copy for uv install"
+chmod +x ~/.config/nore/hermit/bin/hermit.uv.tmp 2>> "$LOGFILE" || log "Failed to make uv temp copy executable"
+
+log "Running hermit install uv with temporary binary"
+if ~/.config/nore/hermit/bin/hermit.uv.tmp install uv >> "$LOGFILE" 2>&1; then
+    log "hermit install uv succeeded"
+else
+    ERROR_CODE=$?
+    log "hermit install uv failed with exit code $ERROR_CODE. See $LOGFILE for details."
+    # Continue anyway as uv might still work with system uv
+fi
+
+# Clean up temp file
+rm -f ~/.config/nore/hermit/bin/hermit.uv.tmp 2>> "$LOGFILE" || log "Failed to remove uv temp copy"
 
 log "uvx $*"
 uvx "$@" || log "Error running uvx $*"
