@@ -1,7 +1,7 @@
 {
   "name": "nore",
   "description": "Use Nore to chat with AI from multiple providers, interact with various MCP servers, and much more!",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "email": "mikeymooney1991@gmail.com",
     "name": "Michael Mooney"
@@ -15,7 +15,8 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev -w",
     "prebuild": "pnpm --filter @nore/mcp-manager build && electron-vite build",
-    "build": "npx tsx build.ts"
+    "build": "npx tsx build.ts",
+    "rebuild-linux": "node rebuild-linux.js"
   },
   "workspaces": [
     "src/rust/mcp-manager"

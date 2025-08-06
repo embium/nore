@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { app, protocol } from 'electron';
 import pkg from '../../package.json';
 import { eventEmitter } from '@/shared/config/context';
 import { createMainWindow } from './windows/mainWindow';
@@ -6,11 +6,16 @@ import { createSplashWindow, closeSplashWindow } from './windows/splashWindow';
 import { setupWindowEvents } from './events/windowEvents';
 
 export function main() {
-  app.setName(pkg.name.toLocaleUpperCase());
+  // Fix for Linux sandbox issues in Snap and AppImage
+  if (process.platform === 'linux') {
+    app.commandLine.appendSwitch('no-sandbox');
+  }
+
+  app.setName(pkg.name);
 
   app.whenReady().then(() => {
     // Show splash screen first
-    const splash = createSplashWindow();
+    createSplashWindow();
 
     // Create main window
     const mainWindow = createMainWindow();

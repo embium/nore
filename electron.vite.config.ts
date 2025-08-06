@@ -9,6 +9,13 @@ import path from 'node:path';
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
+    // Ensure proper Linux compatibility
+    build: {
+      lib: {
+        entry: 'src/main/index.ts',
+      },
+      minify: false,
+    },
     build: {
       lib: {
         entry: 'src/main/index.ts',
@@ -30,10 +37,6 @@ export default defineConfig({
         '@/main': resolve(__dirname, 'src/main/'),
         '@/preload': resolve(__dirname, 'src/preload/'),
         '@/types': resolve(__dirname, 'src/types/'),
-        '@nore/mcp-manager-win32-x64-msvc': resolve(
-          __dirname,
-          'src/rust/mcp-manager/mcp-manager.win32-x64-msvc.node'
-        ),
       },
     },
   },
@@ -49,10 +52,6 @@ export default defineConfig({
         '@/src': resolve(__dirname, 'src/'),
         '@/shared': resolve(__dirname, 'src/shared/'),
         '@/preload': resolve(__dirname, 'src/preload/'),
-        '@nore/mcp-manager-win32-x64-msvc': resolve(
-          __dirname,
-          'src/rust/mcp-manager/mcp-manager.win32-x64-msvc.node'
-        ),
       },
     },
   },
@@ -74,10 +73,6 @@ export default defineConfig({
         '@/main': resolve(__dirname, 'src/main/'),
         '@/preload': resolve(__dirname, 'src/preload/'),
         '@/types': resolve(__dirname, 'src/types/'),
-        '@nore/mcp-manager-win32-x64-msvc': resolve(
-          __dirname,
-          'src/rust/mcp-manager/mcp-manager.win32-x64-msvc.node'
-        ),
       },
     },
     plugins: [
