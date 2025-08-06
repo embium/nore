@@ -16,11 +16,6 @@ export default defineConfig({
       },
       minify: false,
     },
-    build: {
-      lib: {
-        entry: 'src/main/index.ts',
-      },
-    },
     resolve: {
       alias: {
         '@/src': resolve(__dirname, 'src/'),
