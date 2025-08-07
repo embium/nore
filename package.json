@@ -15,8 +15,7 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev -w",
     "prebuild": "pnpm --filter @nore/mcp-manager build && electron-vite build",
-    "build": "npx tsx build.ts",
-    "rebuild-linux": "node rebuild-linux.js"
+    "build": "npx tsx build.ts"
   },
   "workspaces": [
     "src/rust/mcp-manager"

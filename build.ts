@@ -25,38 +25,18 @@ build({
     linux: {
       target: ['AppImage', 'deb'],
       icon: 'src/assets/icons',
-      category: 'Social',
       executableName: pkg.name,
       desktop: {
         Name: pkg.name,
         Comment: pkg.description,
         Icon: pkg.name,
       },
-      // Fix for AppImage and Snap sandbox issues
       asarUnpack: ['**/*.node'],
     },
     msi: {
       oneClick: true,
       perMachine: true,
       runAfterFinish: true,
-    },
-    snap: {
-      confinement: 'classic',
-      plugs: [
-        'default',
-        'desktop',
-        'desktop-legacy',
-        'home',
-        'x11',
-        'wayland',
-        'unity7',
-        'browser-support',
-        'network',
-        'gsettings',
-        'audio-playback',
-        'pulseaudio',
-        'opengl',
-      ],
     },
   },
 });
