@@ -26,11 +26,6 @@ build({
       target: ['AppImage', 'deb'],
       icon: 'src/assets/icons',
       executableName: pkg.name,
-      desktop: {
-        Name: pkg.name,
-        Comment: pkg.description,
-        Icon: pkg.name,
-      },
       asarUnpack: ['**/*.node'],
     },
     msi: {
