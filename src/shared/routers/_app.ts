@@ -4,12 +4,14 @@ import { windowRouter } from './window';
 import { mcpRouter } from './mcp';
 import { fileAttachmentsRouter } from './fileAttachments';
 import { ollamaRouter } from './ollama';
+import { storageRouter } from './storage';
 
 export const appRouter = router({
   window: windowRouter,
   version: publicProcedure.query(async () => {
     return pkg.version;
   }),
+  storage: storageRouter,
   mcp: mcpRouter,
   fileAttachments: fileAttachmentsRouter,
   ollama: ollamaRouter,

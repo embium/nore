@@ -193,9 +193,8 @@ export function updateMessage(params: {
   messageId: string;
   content: string;
   toolExecutions?: ToolExecution[];
-  toolCalls?: MessageToolCalls;
 }) {
-  const { messageId, content, toolExecutions, toolCalls } = params;
+  const { messageId, content, toolExecutions } = params;
 
   // Skip update if content hasn't changed
   if (messageContentCache.get(messageId) === content) {
@@ -233,7 +232,6 @@ export function updateMessage(params: {
       ...updatedMessages[messageIndex],
       contentParts: [{ type: 'text', text: content }],
       ...(toolExecutions ? { toolExecutions } : {}),
-      ...(toolCalls ? { toolCalls } : {}),
     };
 
     const updatedChats = [...chatsList];

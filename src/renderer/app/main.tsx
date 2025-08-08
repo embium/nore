@@ -18,7 +18,7 @@ import t, { queryClient, trpcClient } from '@/shared/config';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './contexts/ThemeProvider';
 
-import { initializeServers } from '@/features/mcp-servers/state';
+import { initializePouchDbPersistence } from '../utils/dbPersistence';
 
 enableReactTracking({
   auto: true,
@@ -46,7 +46,7 @@ if (!rootElement) {
 if (!rootElement?.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
 
-  initializeServers();
+  initializePouchDbPersistence();
 
   root.render(
     <StrictMode>

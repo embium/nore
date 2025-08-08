@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
 import { getMainWindow } from '../windows/mainWindow';
 
 export function setupWindowEvents() {

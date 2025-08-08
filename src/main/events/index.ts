@@ -1,1 +1,1 @@
-export * from './windowEvents';
+export * from './window';

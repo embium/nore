@@ -1,0 +1,4 @@
+provider: 'github'
+owner: 'embium'
+repo: 'nore'
+updaterCacheDirName: 'nore-updater'

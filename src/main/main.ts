@@ -3,7 +3,9 @@ import pkg from '../../package.json';
 import { eventEmitter } from '@/shared/config/context';
 import { createMainWindow } from './windows/mainWindow';
 import { createSplashWindow, closeSplashWindow } from './windows/splashWindow';
-import { setupWindowEvents } from './events/windowEvents';
+import { setupWindowEvents } from './events/window';
+import { initializeUpdater } from './helpers/updater';
+import { setupUpdateEventForwarding } from './events/updates';
 
 export function main() {
   // Fix for Linux sandbox issues in Snap and AppImage
@@ -11,9 +13,10 @@ export function main() {
     app.commandLine.appendSwitch('no-sandbox');
   }
 
-  app.setName(pkg.name);
-
-  app.whenReady().then(() => {
+  /**
+   * Initializes the application when Electron is ready
+   */
+  function initializeApp() {
     // Show splash screen first
     createSplashWindow();
 
@@ -29,8 +32,18 @@ export function main() {
       }, 500);
     });
 
+    // Set up update event forwarding now that main window exists
+    setupUpdateEventForwarding();
+
+    // Initialize and check for updates (no need to wait for this to complete)
+    initializeUpdater();
+
     setupWindowEvents();
-  });
+  }
+
+  app.setName(pkg.name);
+
+  app.whenReady().then(initializeApp);
 
   app.once('window-all-closed', () => app.quit());
 

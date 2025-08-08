@@ -17,10 +17,9 @@ import { observer } from '@legendapp/state/react';
 import SettingsModal from '../features/settings/components/SettingsModal';
 import { PromptsLibraryModal } from '../features/prompts-library/components/PromptsLibraryModal';
 import { ModelHubModal } from '../features/model-hub/components/ModelHubModal';
-import { addServer, startServer } from '../features/mcp/state';
-import { v4 as uuidv4 } from 'uuid';
 import { trpcProxyClient } from '@/src/shared/config';
 import { useNavigate } from '@tanstack/react-router';
+import UpdateProgressIndicator from './UpdateProgressIndicator';
 interface LeftSidebarProps {}
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = observer(() => {
@@ -61,21 +60,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = observer(() => {
   const handleSettingsModalClose = useCallback(() => {
     setSettingsModalVisible(false);
   }, []);
-
-  const handleAddServer = async () => {
-    /*
-    addServer({
-      id: 'mcp-knowledge-graph',
-      name: 'Knowledge Graph',
-      command: 'npx',
-      args: ['-y', '@itseasy21/mcp-knowledge-graph'],
-      status: 'stopped',
-    });
-    startServer('mcp-knowledge-graph');
-    */
-    const tools = await trpcProxyClient.mcp.getTools.query();
-    console.log(tools);
-  };
 
   return (
     <div className="flex flex-col h-full border-r transition-all duration-200 ease-in-out w-[60px] items-center">
@@ -134,6 +118,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = observer(() => {
 
       {/* Bottom section with Settings button */}
       <div className="mt-auto mb-2">
+        <UpdateProgressIndicator />
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

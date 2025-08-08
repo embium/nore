@@ -1,0 +1,13 @@
+## 0.0.3
+
+- Add auto-updating
+- Add persistent storage using pouchdb
+- And fix tool calls not working properly
+
+## 0.0.2 
+
+- Fix AppImage not opening
+
+## 0.0.1
+
+- First release for Nore!
