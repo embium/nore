@@ -19,6 +19,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from './contexts/ThemeProvider';
 
 import { initializePouchDbPersistence } from '../utils/dbPersistence';
+import { initializeServers } from '@/features/mcp-servers/state';
 
 enableReactTracking({
   auto: true,
@@ -46,7 +47,9 @@ if (!rootElement) {
 if (!rootElement?.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
 
-  initializePouchDbPersistence();
+  initializePouchDbPersistence().then(() => {
+    initializeServers();
+  });
 
   root.render(
     <StrictMode>

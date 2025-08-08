@@ -107,11 +107,10 @@ export const isLoadingRegistry = computed(() =>
 
 export function initializeServers() {
   const servers = mcpServersState$.serversList.get();
-  if (servers.length > 0) {
-    return;
-  }
+  console.log('Initializing servers');
   for (const server of servers) {
     if (server.status === 'running') {
+      console.log('Starting server', server.id);
       startServer(server.id);
     }
   }
@@ -237,7 +236,11 @@ export async function startServer(serverId: string) {
       args: server.args,
     });
 
-    server.status = status ? 'running' : 'stopped';
+    mcpServersState$.serversList.set(
+      servers.map((s) =>
+        s.id === serverId ? { ...s, status: status ? 'running' : 'stopped' } : s
+      )
+    );
     return status;
   } catch (error) {
     console.error('Failed to start server:', error);
@@ -258,7 +261,9 @@ export async function stopServer(serverId: string) {
     const status = await trpcProxyClient.mcp.stopServer.mutate({
       id: serverId,
     });
-    server.status = 'stopped';
+    mcpServersState$.serversList.set(
+      servers.map((s) => (s.id === serverId ? { ...s, status: 'stopped' } : s))
+    );
     return status;
   } catch (error) {
     console.error('Failed to stop server:', error);
