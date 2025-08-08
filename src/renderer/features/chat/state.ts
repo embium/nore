@@ -6,7 +6,7 @@ import { persistObservable } from '@legendapp/state/persist';
 import { v4 as uuidv4 } from 'uuid';
 
 // Types
-import type { Message, ToolExecution } from '@/types/chat';
+import type { Message, MessageToolCalls, ToolExecution } from '@/types/chat';
 
 interface FileWithPreview {
   file: File;
@@ -193,8 +193,9 @@ export function updateMessage(params: {
   messageId: string;
   content: string;
   toolExecutions?: ToolExecution[];
+  toolCalls?: MessageToolCalls;
 }) {
-  const { messageId, content, toolExecutions } = params;
+  const { messageId, content, toolExecutions, toolCalls } = params;
 
   // Skip update if content hasn't changed
   if (messageContentCache.get(messageId) === content) {
@@ -232,6 +233,7 @@ export function updateMessage(params: {
       ...updatedMessages[messageIndex],
       contentParts: [{ type: 'text', text: content }],
       ...(toolExecutions ? { toolExecutions } : {}),
+      ...(toolCalls ? { toolCalls } : {}),
     };
 
     const updatedChats = [...chatsList];

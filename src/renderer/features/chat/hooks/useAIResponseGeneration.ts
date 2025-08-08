@@ -26,7 +26,13 @@ import {
 
 // Types
 import type { FileWithPreview } from '@/types/common';
-import type { Message, MessageTextPart, ToolExecution } from '@/types/chat';
+import type {
+  Message,
+  MessageTextPart,
+  MessageToolCall,
+  MessageToolCalls,
+  ToolExecution,
+} from '@/types/chat';
 import type {
   ModelInterface,
   onResultChangeWithCancel,
@@ -140,6 +146,22 @@ export function useAIResponseGeneration(
       // Update if content has changed OR if we have tool executions to add
       const contentChanged = messageContentRef.current !== content;
       const hasToolExecutions = toolExecutions && toolExecutions.length > 0;
+      const toolCalls: MessageToolCalls = {};
+
+      if (hasToolExecutions) {
+        for (const toolExecution of toolExecutions) {
+          const toolCallId = `tool-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+          const toolCall: MessageToolCall = {
+            id: toolCallId,
+            function: {
+              name: toolExecution.toolName,
+              arguments: JSON.stringify(toolExecution.parameters),
+            },
+          };
+
+          toolCalls[toolCallId] = toolCall;
+        }
+      }
 
       if (contentChanged || hasToolExecutions) {
         if (contentChanged) {
@@ -151,6 +173,7 @@ export function useAIResponseGeneration(
           messageId: id,
           content,
           toolExecutions,
+          toolCalls,
         });
       }
     },

@@ -118,7 +118,9 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     const coreMessages = await convertToCoreMessages(messages);
     const result = streamText({
       model,
-      maxSteps: 1,
+      // Allow the AI SDK to perform tool-call -> tool-result chaining automatically
+      // so that assistant tool calls are followed by corresponding tool messages
+      maxSteps: 8,
       messages: coreMessages,
       tools: options?.tools,
       abortSignal: options.signal,
