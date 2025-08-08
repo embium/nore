@@ -62,12 +62,15 @@ function McpServersRegistryComponent() {
   const [registryServers, setRegistryServers] = useState<RegistryServer[]>([]);
   const [filteredServers, setFilteredServers] = useState<RegistryServer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedServer, setSelectedServer] = useState<RegistryServer | null>(
     null
   );
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 24;
 
   useEffect(() => {
     const loadRegistryServers = async () => {
@@ -75,10 +78,11 @@ function McpServersRegistryComponent() {
       setLoadingRegistry(true);
       try {
         const client = new Client();
-        const serversResponse = await client.getServers();
+        const serversResponse = await client.getServers({ page: 1, pageSize });
         const servers = serversResponse.servers || [];
         setRegistryServers(servers);
         setFilteredServers(servers);
+        setPage(1);
       } catch (error) {
         console.error('Failed to fetch registry servers:', error);
       } finally {
@@ -102,9 +106,12 @@ function McpServersRegistryComponent() {
         const client = new Client();
         const serversResponse = await client.getServers({
           searchQuery: searchQuery,
+          page: 1,
+          pageSize,
         });
         const servers = serversResponse.servers || [];
         setFilteredServers(servers);
+        setPage(1);
       } catch (error) {
         console.error('Failed to search registry servers:', error);
         // Fallback to local filtering if search fails
@@ -115,6 +122,7 @@ function McpServersRegistryComponent() {
             server.description?.toLowerCase().includes(query)
         );
         setFilteredServers(filtered);
+        setPage(1);
       } finally {
         setIsLoading(false);
       }
@@ -180,6 +188,35 @@ function McpServersRegistryComponent() {
       console.error('Failed to install server:', error);
     } finally {
       setIsInstalling(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (isLoading || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const client = new Client();
+      const nextPage = page + 1;
+      const serversResponse = await client.getServers({
+        page: nextPage,
+        pageSize,
+        searchQuery: searchQuery.trim() === '' ? undefined : searchQuery,
+      });
+      const newServers: RegistryServer[] = serversResponse.servers || [];
+
+      setFilteredServers((prev) => [...prev, ...newServers]);
+
+      // If not searching, also extend the base registry list so clearing search
+      // shows the accumulated list
+      if (searchQuery.trim() === '') {
+        setRegistryServers((prev) => [...prev, ...newServers]);
+      }
+
+      setPage(nextPage);
+    } catch (error) {
+      console.error('Failed to load more registry servers:', error);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -277,6 +314,17 @@ function McpServersRegistryComponent() {
                 </CardFooter>
               </Card>
             ))}
+          </div>
+        )}
+        {filteredServers.length > 0 && (
+          <div className="flex items-center justify-center py-12">
+            <Button
+              variant="outline"
+              onClick={handleLoadMore}
+              disabled={isLoading || isLoadingMore}
+            >
+              {isLoadingMore ? 'Loading...' : 'Load More'}
+            </Button>
           </div>
         )}
       </div>
