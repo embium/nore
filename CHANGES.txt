@@ -1,3 +1,9 @@
+## 0.0.4
+
+- Correct error handling when dealing with MCP servers start
+- Clean up the MCP server manager code
+- Correctly use typography plugin from tailwind for markdown support in chat
+
 ## 0.0.3
 
 - Add auto-updating
