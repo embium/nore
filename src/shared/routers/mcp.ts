@@ -22,24 +22,29 @@ export const mcpRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const manager = new McpManager('main', () => {});
+      try {
+        const manager = new McpManager();
 
-      manager.start({
-        id: input.id,
-        command: convertCommand(input.command),
-        args: input.args,
-      });
-      return true;
+        await manager.start({
+          id: input.id,
+          command: convertCommand(input.command),
+          args: input.args,
+        });
+        return true;
+      } catch (error) {
+        console.error('Failed to start server:', error);
+        return false;
+      }
     }),
   stopServer: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
-      const manager = new McpManager('main', () => {});
+      const manager = new McpManager();
       manager.stop(input.id);
       return true;
     }),
   getTools: publicProcedure.query(async () => {
-    const manager = new McpManager('main', () => {});
+    const manager = new McpManager();
     return manager.getTools();
   }),
   executeTool: publicProcedure
@@ -51,7 +56,7 @@ export const mcpRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const manager = new McpManager('main', () => {});
+      const manager = new McpManager();
       const result = await manager.executeTool(input);
       return result;
     }),

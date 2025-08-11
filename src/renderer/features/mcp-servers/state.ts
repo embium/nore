@@ -241,10 +241,13 @@ export async function startServer(serverId: string) {
         s.id === serverId ? { ...s, status: status ? 'running' : 'stopped' } : s
       )
     );
+
     return status;
   } catch (error) {
     console.error('Failed to start server:', error);
-    server.status = 'stopped';
+    mcpServersState$.serversList.set(
+      servers.map((s) => (s.id === serverId ? { ...s, status: 'stopped' } : s))
+    );
     return false;
   }
 }

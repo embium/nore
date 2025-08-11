@@ -1,6 +1,6 @@
 use napi::Error as NapiError;
 use napi_derive::napi;
-use rmcp::Error as McpError;
+use rmcp::ErrorData as McpError;
 use thiserror::Error;
 
 /// Custom error types for the MCP server management library

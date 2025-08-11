@@ -1,23 +1,19 @@
 use crate::error::{Error, Result};
-use crate::models::{McpEvent, ServerConfig, ToolExecutionRequest, ToolInfo};
+use crate::models::{ServerConfig, ToolExecutionRequest, ToolInfo};
 use dashmap::DashMap;
-use napi::threadsafe_function::ThreadsafeFunction;
 use rmcp::transport::TokioChildProcess;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::path::Path;
 
-use tokio::process::{Child, Command};
+use tokio::process::Command;
 use std::process::Stdio;
 use std::sync::Arc;
 use sysinfo::{Pid, System};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::Mutex;
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 use rmcp::transport::ConfigureCommandExt;
 
 struct Server {
-    /// The child process running the server
-    process: Arc<Mutex<Child>>,
     /// The MCP client connected to the server
     client: Arc<Mutex<Option<rmcp::service::RunningService<rmcp::service::RoleClient, ()>>>>,
     /// The PID of the server process
@@ -28,12 +24,8 @@ struct Server {
 
 /// Manager for MCP servers
 pub struct McpManager {
-    /// Unique identifier for this manager instance
-    manager_id: String,
     /// Map of server ID to server instance
     servers: DashMap<String, Server>,
-    /// Callback function for events
-    event_callback: ThreadsafeFunction<McpEvent>,
     /// System information for process management
     system: Arc<Mutex<sysinfo::System>>,
     /// Flag indicating if this manager has been shut down
@@ -42,14 +34,12 @@ pub struct McpManager {
 
 impl McpManager {
     /// Create a new MCP manager
-    pub fn new(manager_id: String, event_callback: ThreadsafeFunction<McpEvent>) -> Self {
+    pub fn new() -> Self {
         let mut system = System::new();
         system.refresh_all();
 
         Self {
-            manager_id,
             servers: DashMap::new(),
-            event_callback,
             system: Arc::new(Mutex::new(system)),
             is_shutdown: AtomicBool::new(false),
         }
@@ -67,17 +57,11 @@ impl McpManager {
 
         // Check if manager is shut down
         if self.is_shutdown.load(Ordering::SeqCst) {
-            return Err(Error::ManagerShutdown(format!(
-                "Manager '{}' has been shut down",
-                self.manager_id
-            )));
+            return Err(Error::ManagerShutdown("Manager has been shut down".to_string()));
         }
 
         // Emit info event
-        self.emit_event(McpEvent::info(
-            &format!("Starting server '{}' in manager '{}'...", config.id, self.manager_id),
-            Some(&config.id),
-        ));
+        info!(server_id = %config.id, "Starting MCP server...");
 
         // Create command using OS-specific command handling
         let mut command = Command::new(&config.command);
@@ -95,6 +79,7 @@ impl McpManager {
         // On Windows, hide the console window
         #[cfg(target_os = "windows")]
         {
+            #[allow(unused_imports)]
             use std::os::windows::process::CommandExt;
             const CREATE_NO_WINDOW: u32 = 0x08000000;
             command.creation_flags(CREATE_NO_WINDOW);
@@ -108,15 +93,11 @@ impl McpManager {
         // Set up stderr logging
         if let Some(stderr) = child.stderr.take() {
             let server_id = config.id.clone();
-            let event_callback = self.event_callback.clone();
-            
             tokio::spawn(async move {
                 let reader = BufReader::new(stderr);
                 let mut lines = reader.lines();
-                
                 while let Some(line) = lines.next_line().await.unwrap_or(None) {
-                    let event = McpEvent::log("info", &line, Some(&server_id));
-                    event_callback.call(Ok(event), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
+                    info!(target: "mcp-server", server_id = %server_id, "{}", line);
                 }
             });
         }
@@ -135,6 +116,7 @@ impl McpManager {
             // On Windows, hide the console window for the transport process too
             #[cfg(target_os = "windows")]
             {
+                #[allow(unused_imports)]
                 use std::os::windows::process::CommandExt;
                 const CREATE_NO_WINDOW: u32 = 0x08000000;
                 cmd.creation_flags(CREATE_NO_WINDOW);
@@ -151,7 +133,7 @@ impl McpManager {
 
         // Get server info
         let server_info = service.peer_info();
-        debug!("Connected to server: {:?}", server_info);
+        debug!(server_id = %config.id, ?server_info, "Connected to MCP server");
 
         // Get available tools
         let tools_result = service.list_tools(Default::default()).await.map_err(|e| {
@@ -176,7 +158,6 @@ impl McpManager {
         })?;
         
         let server = Server {
-            process: Arc::new(Mutex::new(child)),
             client: Arc::new(Mutex::new(Some(service))),
             pid,
             tools: tools.clone(),
@@ -184,13 +165,7 @@ impl McpManager {
 
         self.servers.insert(config.id.clone(), server);
 
-        // Emit events
-        self.emit_event(McpEvent::server_started(&config.id));
-        self.emit_event(McpEvent::tools_updated(tools));
-        self.emit_event(McpEvent::info(
-            &format!("Server '{}' started successfully in manager '{}'", config.id, self.manager_id),
-            Some(&config.id),
-        ));
+        info!(server_id = %config.id, tools_count = tools.len(), "MCP server started successfully");
 
         Ok(())
     }
@@ -199,22 +174,16 @@ impl McpManager {
     pub async fn stop(&self, server_id: &str) -> Result<()> {
         // Check if manager is shut down
         if self.is_shutdown.load(Ordering::SeqCst) {
-            return Err(Error::ManagerShutdown(format!(
-                "Manager '{}' has been shut down",
-                self.manager_id
-            )));
+            return Err(Error::ManagerShutdown("Manager has been shut down".to_string()));
         }
 
         // Check if server exists
         let server = match self.servers.remove(server_id) {
             Some(server_entry) => server_entry.1,
-            None => return Err(Error::ServerNotFound(format!("Server with ID '{}' not found in manager '{}'", server_id, self.manager_id)))
+            None => return Err(Error::ServerNotFound(format!("Server with ID '{}' not found", server_id)))
         };
 
-        self.emit_event(McpEvent::info(
-            &format!("Stopping server '{}' in manager '{}'...", server_id, self.manager_id),
-            Some(server_id),
-        ));
+        info!(server_id = %server_id, "Stopping MCP server...");
 
         // Cancel MCP service
         {
@@ -230,12 +199,7 @@ impl McpManager {
         // Kill process and all descendants
         self.kill_process_tree(server.pid as i32).await?;
 
-        // Emit events
-        self.emit_event(McpEvent::server_stopped(server_id));
-        self.emit_event(McpEvent::info(
-            &format!("Server '{}' stopped successfully in manager '{}'", server_id, self.manager_id),
-            Some(server_id),
-        ));
+        info!(server_id = %server_id, "MCP server stopped successfully");
 
         Ok(())
     }
@@ -307,39 +271,29 @@ impl McpManager {
     pub async fn execute_tool(&self, request: ToolExecutionRequest) -> Result<String> {
         // Check if manager is shut down
         if self.is_shutdown.load(Ordering::SeqCst) {
-            return Err(Error::ManagerShutdown(format!(
-                "Manager '{}' has been shut down",
-                self.manager_id
-            )));
+            return Err(Error::ManagerShutdown("Manager has been shut down".to_string()));
         }
 
         // Check if server exists
-        let server = self.servers.get(&request.server_id).ok_or_else(|| {
-            Error::ServerNotFound(format!(
-                "Server with ID '{}' not found in manager '{}'",
-                request.server_id, self.manager_id
-            ))
-        })?;
+        let server = self
+            .servers
+            .get(&request.server_id)
+            .ok_or_else(|| Error::ServerNotFound(format!("Server with ID '{}' not found", request.server_id)))?;
 
         // Check if tool exists
-        server.value()
+        server
+            .value()
             .tools
             .iter()
             .find(|t| t.tool_name == request.tool_name)
             .ok_or_else(|| {
                 Error::ToolNotFound(format!(
-                    "Tool '{}' not found on server '{}' in manager '{}'",
-                    request.tool_name, request.server_id, self.manager_id
+                    "Tool '{}' not found on server '{}'",
+                    request.tool_name, request.server_id
                 ))
             })?;
 
-        self.emit_event(McpEvent::info(
-            &format!(
-                "Executing tool '{}' on server '{}' in manager '{}'...",
-                request.tool_name, request.server_id, self.manager_id
-            ),
-            Some(&request.server_id),
-        ));
+        info!(server_id = %request.server_id, tool = %request.tool_name, "Executing tool...");
 
         // Parse inputs from JSON string
         let inputs_value: serde_json::Value = serde_json::from_str(&request.inputs).map_err(|e| {
@@ -389,24 +343,15 @@ impl McpManager {
             Error::ToolExecutionError(format!("Failed to serialize tool result: {}", e))
         })?;
 
-        self.emit_event(McpEvent::info(
-            &format!(
-                "Tool '{}' executed successfully on server '{}' in manager '{}'",
-                request.tool_name, request.server_id, self.manager_id
-            ),
-            Some(&request.server_id),
-        ));
+        info!(server_id = %request.server_id, tool = %request.tool_name, "Tool executed successfully");
         
         return Ok(result_json);
     }
 
-    /// Emit an event to TypeScript
-    fn emit_event(&self, event: McpEvent) {
-        self.event_callback
-            .call(Ok(event), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
-    }
+    // Event emission removed; using tracing logs instead
 
     /// Stop all servers managed by this manager
+    #[allow(dead_code)]
     pub async fn stop_all_servers(&self) -> Result<()> {
         // Mark manager as shut down
         self.is_shutdown.store(true, Ordering::SeqCst);
@@ -418,18 +363,12 @@ impl McpManager {
         for server_id in server_ids {
             if let Err(e) = self.stop(&server_id).await {
                 // Log error but continue stopping other servers
-                self.emit_event(McpEvent::error(
-                    &format!("Error stopping server '{}': {}", server_id, e),
-                    Some(&server_id),
-                ));
+                warn!(server_id = %server_id, error = %e, "Error stopping MCP server");
             }
         }
 
         Ok(())
     }
 
-    /// Get the manager ID
-    pub fn get_manager_id(&self) -> &str {
-        &self.manager_id
-    }
+    // manager_id removed in singleton design
 }

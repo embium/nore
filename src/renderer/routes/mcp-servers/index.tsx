@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { observer } from '@legendapp/state/react';
 import { FiServer, FiPlus, FiX } from 'react-icons/fi';
+import { v4 as uuidv4 } from 'uuid';
 
 // State
 import { addServer } from '@/features/mcp-servers/state';
@@ -28,7 +29,6 @@ import { MainHeader } from '@/components/MainHeader';
 
 function AddCustomServerComponent() {
   const navigate = useNavigate();
-  const [serverName, setServerName] = useState('');
   const [serverDisplayName, setServerDisplayName] = useState('');
   const [serverCommand, setServerCommand] = useState('');
   const [envVars, setEnvVars] = useState<Array<{ key: string; value: string }>>(
@@ -55,7 +55,7 @@ function AddCustomServerComponent() {
   };
 
   const handleAddServer = async () => {
-    if (!serverName || !serverCommand) return;
+    if (!serverDisplayName || !serverCommand) return;
 
     setIsSubmitting(true);
 
@@ -74,10 +74,11 @@ function AddCustomServerComponent() {
       }
 
       // Add the server
-      await addServer({
-        id: serverName.toLowerCase().replace(/\s+/g, '-'),
-        name: serverName,
-        displayName: serverDisplayName || serverName,
+      const serverId = uuidv4();
+      addServer({
+        id: serverId,
+        name: serverDisplayName,
+        displayName: serverDisplayName,
         command,
         args,
         status: 'stopped',
@@ -110,23 +111,7 @@ function AddCustomServerComponent() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="server-name">Server ID</Label>
-                <Input
-                  id="server-name"
-                  placeholder="e.g., my-custom-server"
-                  value={serverName}
-                  onChange={(e) => setServerName(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  A unique identifier for this server. Used internally and for
-                  API calls.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="server-display-name">
-                  Display Name (Optional)
-                </Label>
+                <Label htmlFor="server-display-name">Display Name</Label>
                 <Input
                   id="server-display-name"
                   placeholder="e.g., My Custom Server"
@@ -134,8 +119,7 @@ function AddCustomServerComponent() {
                   onChange={(e) => setServerDisplayName(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  A friendly name to display in the UI. If not provided, the
-                  server ID will be used.
+                  A friendly name to display in the UI.
                 </p>
               </div>
 
@@ -208,7 +192,9 @@ function AddCustomServerComponent() {
                 <div className="pt-4">
                   <Button
                     onClick={handleAddServer}
-                    disabled={!serverName || !serverCommand || isSubmitting}
+                    disabled={
+                      !serverDisplayName || !serverCommand || isSubmitting
+                    }
                     className="w-full"
                   >
                     <FiPlus className="mr-2 h-4 w-4" />

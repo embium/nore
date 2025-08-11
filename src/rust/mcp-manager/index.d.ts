@@ -34,32 +34,11 @@ export interface ToolExecutionRequest {
   /** Input parameters for the tool (as a JSON string) */
   inputs: string
 }
-/** Event emitted by the MCP manager */
-export interface McpEvent {
-  /** Type of event */
-  eventType: string
-  /** Event payload (as a JSON string) */
-  payload: string
-}
-/** Log event emitted by the MCP manager */
-export interface LogEvent {
-  /** Log level */
-  level: string
-  /** Log message */
-  message: string
-  /** Server ID (if applicable) */
-  serverId?: string
-}
-/** Tools updated event emitted by the MCP manager */
-export interface ToolsUpdatedEvent {
-  /** List of available tools */
-  tools: Array<ToolInfo>
-}
 export type McpManagerWrapper = McpManager
 /** NAPI wrapper for the MCP manager */
 export declare class McpManager {
-  /** Create a new MCP manager wrapper */
-  constructor(managerId: string, eventCallback: (err: Error | null, arg: McpEvent) => any)
+  /** Create a new MCP manager wrapper (initializes singleton if needed) */
+  constructor()
   /** Start a new MCP server */
   start(config: ServerConfig): Promise<void>
   /** Stop an MCP server */
@@ -68,9 +47,10 @@ export declare class McpManager {
   getTools(): Array<ToolInfo>
   /** Execute a tool on an MCP server */
   executeTool(request: ToolExecutionRequest): Promise<string>
-  /** Get the manager ID */
-  getManagerId(): string
-  /** Get the current working directory of the Rust library */
+  /**
+   * Get the manager ID
+   * Get the current working directory of the Rust library
+   */
   getCurrentDir(): string
 }
 export declare namespace error_codes {

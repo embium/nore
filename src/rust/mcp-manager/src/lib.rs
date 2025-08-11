@@ -13,7 +13,7 @@ mod workspace_wrapper;
 
 // Re-export the public API
 pub use error::error_codes;
-pub use models::{McpEvent, ServerConfig, ToolExecutionRequest, ToolInfo};
+pub use models::{ServerConfig, ToolExecutionRequest, ToolInfo};
 
 // Initialize logging when the library is loaded
 #[napi::module_init]
@@ -24,5 +24,5 @@ fn init() {
         .init();
 }
 
-// Export the MCP manager wrapper (now using the workspace-based implementation)
+// Export the MCP manager wrapper (singleton-based implementation)
 pub use crate::workspace_wrapper::McpManagerWrapper;
