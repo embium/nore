@@ -106,18 +106,26 @@ export const isLoadingRegistry = computed(() =>
 );
 
 export function initializeServers() {
-  const servers = mcpServersState$.serversList.get();
+  batch(() => {
+    const servers = mcpServersState$.serversList.get();
 
-  mcpServersState$.serversList.set(
-    servers.map((s) => ({ ...s, status: 'stopped' }))
-  );
+    // Capture the list of servers that were previously running
+    const runningServers = servers.filter((s) => s.status === 'running');
 
-  for (const server of servers) {
-    if (server.status === 'running') {
-      console.log('Starting server', server.id);
-      startServer(server.id);
-    }
-  }
+    // Set all servers to stopped status
+    mcpServersState$.serversList.set(
+      servers.map((s) => ({ ...s, status: 'stopped' }))
+    );
+
+    // Start the servers that were previously running
+    // Use setTimeout to avoid blocking the batch and ensure proper async handling
+    setTimeout(() => {
+      for (const server of runningServers) {
+        console.log('Starting server', server.id);
+        startServer(server.id);
+      }
+    }, 0);
+  });
 }
 
 // Add server
@@ -234,8 +242,11 @@ export async function startServer(serverId: string) {
   }
 
   try {
+    // Set status to starting - get fresh state each time
     mcpServersState$.serversList.set(
-      servers.map((s) => (s.id === serverId ? { ...s, status: 'starting' } : s))
+      mcpServersState$.serversList
+        .get()
+        .map((s) => (s.id === serverId ? { ...s, status: 'starting' } : s))
     );
 
     const status = await trpcProxyClient.mcp.startServer.mutate({
@@ -244,16 +255,22 @@ export async function startServer(serverId: string) {
       args: server.args,
     });
 
+    // Set final status - get fresh state each time
     mcpServersState$.serversList.set(
-      servers.map((s) =>
-        s.id === serverId ? { ...s, status: status ? 'running' : 'error' } : s
-      )
+      mcpServersState$.serversList
+        .get()
+        .map((s) =>
+          s.id === serverId ? { ...s, status: status ? 'running' : 'error' } : s
+        )
     );
 
     return status;
   } catch (error) {
+    // Set error status - get fresh state each time
     mcpServersState$.serversList.set(
-      servers.map((s) => (s.id === serverId ? { ...s, status: 'error' } : s))
+      mcpServersState$.serversList
+        .get()
+        .map((s) => (s.id === serverId ? { ...s, status: 'error' } : s))
     );
     return false;
   }
@@ -271,8 +288,11 @@ export async function stopServer(serverId: string) {
     const status = await trpcProxyClient.mcp.stopServer.mutate({
       id: serverId,
     });
+    // Get fresh state when updating
     mcpServersState$.serversList.set(
-      servers.map((s) => (s.id === serverId ? { ...s, status: 'stopped' } : s))
+      mcpServersState$.serversList
+        .get()
+        .map((s) => (s.id === serverId ? { ...s, status: 'stopped' } : s))
     );
     return status;
   } catch (error) {
