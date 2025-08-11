@@ -1,3 +1,7 @@
+## 0.0.6
+
+- Fix race condition in MCP servers initialization
+
 ## 0.0.5
 
 - Add additional states to MCP server... 'starting' and 'error'
