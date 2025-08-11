@@ -8,8 +8,10 @@ let mainWindow: BrowserWindow | null = null;
 
 export function createMainWindow() {
   mainWindow = new BrowserWindow({
-    minWidth: 500,
-    minHeight: 500,
+    minWidth: 1024,
+    minHeight: 768,
+    width: 1024,
+    height: 768,
     frame: false,
     show: false, // Hide the window initially
     webPreferences: {

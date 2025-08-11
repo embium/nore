@@ -23,7 +23,7 @@ export function createSplashWindow() {
   const splashPath = isDev
     ? join(__dirname, '../../src/renderer/splash.html')
     : join(__dirname, '../renderer/splash.html');
-    
+
   splashWindow.loadFile(splashPath);
 
   splashWindow.once('ready-to-show', () => {
