@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Add additional states to MCP server... 'starting' and 'error'
+
 ## 0.0.4
 
 - Correct error handling when dealing with MCP servers start
