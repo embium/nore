@@ -3,6 +3,7 @@
 - Correct error handling when dealing with MCP servers start
 - Clean up the MCP server manager code
 - Correctly use typography plugin from tailwind for markdown support in chat
+- Add context menu for messages
 
 ## 0.0.3
 

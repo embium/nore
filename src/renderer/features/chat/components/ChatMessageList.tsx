@@ -19,6 +19,7 @@ import { useMessageListScroll } from '../hooks/useMessageListScroll';
 
 // Types
 import type { Message } from '@/types/chat';
+import { MessageContextMenu } from './MessageContextMenu';
 
 interface ChatsMessageListProps {
   messages: Message[];
@@ -55,13 +56,22 @@ const ChatMessageListComponent = React.forwardRef<
     (index: number) => {
       const message = messages[index];
       return (
-        <MessageItem
+        <MessageContextMenu
+          key={message.id}
+          isUser={message.role === 'user'}
           message={message}
+          selectedText={selectedText}
           onEditMessage={onEditMessage}
           onDeleteMessage={onDeleteMessage}
-          onSelectedText={onSelectedText}
-          onResendMessage={onResendMessage}
-        />
+        >
+          <MessageItem
+            message={message}
+            onEditMessage={onEditMessage}
+            onDeleteMessage={onDeleteMessage}
+            onSelectedText={onSelectedText}
+            onResendMessage={onResendMessage}
+          />
+        </MessageContextMenu>
       );
     },
     [
