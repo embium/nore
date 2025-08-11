@@ -1,5 +1,4 @@
 import type React from 'react';
-import { useState } from 'react';
 import { FiServer, FiPlay, FiSquare } from 'react-icons/fi';
 import { observer } from '@legendapp/state/react';
 import { Link } from '@tanstack/react-router';
@@ -14,20 +13,11 @@ import { startServer, stopServer } from '@/features/mcp-servers/state';
 
 const McpServersManagerComponent: React.FC = () => {
   const mcpServers = mcpServersState$.serversList.get();
-  const [pendingServers, setPendingServers] = useState<Record<string, boolean>>(
-    {}
-  );
 
   const handleToggleServer = async (
     serverId: string,
     currentStatus: string
   ) => {
-    // Optimistically update UI
-    setPendingServers((prev) => ({
-      ...prev,
-      [serverId]: true,
-    }));
-
     try {
       if (currentStatus === 'running') {
         await stopServer(serverId);
@@ -36,12 +26,6 @@ const McpServersManagerComponent: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to toggle server status:', error);
-    } finally {
-      // Clear pending state
-      setPendingServers((prev) => ({
-        ...prev,
-        [serverId]: false,
-      }));
     }
   };
 
@@ -81,14 +65,9 @@ const McpServersManagerComponent: React.FC = () => {
           </div>
         ) : (
           mcpServers.map((server) => {
-            // Determine if this server is in a pending state
-            const isPending = pendingServers[server.id];
-            // For optimistic UI, if pending, show the opposite of current status
-            const displayStatus = isPending
-              ? server.status === 'running'
-                ? 'stopped'
-                : 'running'
-              : server.status;
+            // Determine button state based on server status
+            const isButtonDisabled = server.status === 'starting';
+            const shouldShowStopButton = server.status === 'running';
 
             return (
               <CustomDropdownItem
@@ -104,7 +83,17 @@ const McpServersManagerComponent: React.FC = () => {
                 >
                   <div className="flex items-center gap-2">
                     <div
-                      className={`h-2 w-2 rounded-full ${displayStatus === 'running' ? 'bg-green-500' : 'bg-gray-400'}`}
+                      className={`h-2 w-2 rounded-full ${
+                        server.status === 'running'
+                          ? 'bg-green-500'
+                          : server.status === 'starting'
+                            ? 'bg-yellow-500'
+                            : server.status === 'error'
+                              ? 'bg-red-500'
+                              : server.status === 'idle'
+                                ? 'bg-blue-400'
+                                : 'bg-gray-400'
+                      }`}
                     />
                     <div className="flex-grow truncate text-sm">
                       {server.displayName || server.name}
@@ -115,9 +104,9 @@ const McpServersManagerComponent: React.FC = () => {
                     size="sm"
                     className="h-6 w-6 p-0"
                     onClick={() => handleToggleServer(server.id, server.status)}
-                    disabled={isPending}
+                    disabled={isButtonDisabled}
                   >
-                    {displayStatus === 'running' ? (
+                    {shouldShowStopButton ? (
                       <FiSquare className="h-3 w-3" />
                     ) : (
                       <FiPlay className="h-3 w-3" />
