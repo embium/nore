@@ -4,6 +4,7 @@
 - Clean up the MCP server manager code
 - Correctly use typography plugin from tailwind for markdown support in chat
 - Add context menu for messages
+- Set a better initial width and height for the main window
 
 ## 0.0.3
 
