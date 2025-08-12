@@ -1,3 +1,7 @@
+## 0.1.0
+
+- Add a way to create custom providers
+
 ## 0.0.6
 
 - Fix race condition in MCP servers initialization

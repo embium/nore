@@ -1,4 +1,4 @@
-import type { ModelMeta } from '@/types/chat';
+import type { ModelMeta } from '@/types/ai';
 import type { ModelHelpers } from '../core/base';
 import OpenAICompatible from './openai-compatible';
 

@@ -16,6 +16,7 @@ import XAI from '@/lib/ai/models/xai';
 import DeepSeek from '@/lib/ai/models/deepseek';
 import TogetherAI from '@/lib/ai/models/togetherai';
 import OpenRouter from '@/src/renderer/lib/ai/models/openrouter';
+import CustomProvider from '@/lib/ai/models/custom-provider';
 
 // State
 import { getProviderConfig } from '../aiProviders/providerConfigs';
@@ -25,7 +26,11 @@ import {
   type ProviderType,
   type ProviderConfig,
   type ModelConfig,
+  type CustomProviderConfig,
   PROVIDER_CONFIG_MAP,
+  isCustomProvider,
+  isBuiltInProvider,
+  getProviderConfigRequirements,
 } from '@/types/ai';
 import type { ModelInterface } from '@/lib/ai/core/base';
 import type { GeminiModel } from '@/lib/ai/models/gemini';
@@ -60,6 +65,25 @@ export function initializeModelClass(
       ? (params.extraParameters as Record<string, unknown>)
       : {}),
   };
+
+  // Handle custom providers first
+  if (isCustomProvider(providerConfig)) {
+    return new CustomProvider({
+      name: providerConfig.name,
+      apiKey: providerConfig.apiKey,
+      apiHost: providerConfig.apiHost,
+      model: modelId,
+      headers: providerConfig.headers,
+      modelPath: providerConfig.modelPath,
+      supportedFeatures: providerConfig.supportedFeatures,
+      ...baseParams,
+    });
+  }
+
+  // Handle built-in providers
+  if (!isBuiltInProvider(providerId)) {
+    throw new Error(`Unknown provider: ${providerId}`);
+  }
 
   // Create model instances with appropriate parameters
   switch (providerId) {
@@ -138,7 +162,7 @@ export function initializeModelClass(
         ...baseParams,
       });
     default:
-      throw new Error(`Unknown provider: ${providerId}`);
+      throw new Error(`Unsupported built-in provider: ${providerId}`);
   }
 }
 
@@ -228,9 +252,12 @@ export async function fetchAvailableModels(
     return [];
   }
 
+  // Get provider requirements
+  const requirements = getProviderConfigRequirements(providerId, provider);
+
   // Validate API key if required
   if (
-    PROVIDER_CONFIG_MAP[providerId].needsApiKey &&
+    requirements.needsApiKey &&
     (!provider.apiKey || provider.apiKey.trim() === '')
   ) {
     throw new Error(`API key is required for ${providerId}`);
@@ -238,7 +265,7 @@ export async function fetchAvailableModels(
 
   // Validate API host if required
   if (
-    PROVIDER_CONFIG_MAP[providerId].needsApiHost &&
+    requirements.needsApiHost &&
     (!provider.apiHost || provider.apiHost.trim() === '')
   ) {
     throw new Error(`API host is required for ${providerId}`);

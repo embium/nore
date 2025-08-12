@@ -9,8 +9,10 @@ import { persistObservable } from '@legendapp/state/persist';
 import type {
   ProviderType,
   ProviderConfig,
+  CustomProviderConfig,
   AISettingsState,
   ModelConfig,
+  createCustomProviderConfig,
 } from '@/types/ai';
 import { defaultProviders } from '@/shared/constants';
 
@@ -60,7 +62,9 @@ export function updateProviderConfig(
     ProviderConfig
   >;
   const providerConfig = providers[providerId];
-  const selectedModelId = aiSettingsState$.selectedModelId.get() as string | null;
+  const selectedModelId = aiSettingsState$.selectedModelId.get() as
+    | string
+    | null;
 
   if (selectedModelId) {
     const models = aiSettingsState$.models.get() as Record<string, ModelConfig>;
@@ -90,6 +94,92 @@ export function updateProviderConfig(
     // Update the models state with the new object
     aiSettingsState$.models.set(updatedModels);
   }
+}
+
+// Custom provider management functions
+export function addCustomProvider(config: CustomProviderConfig): void {
+  const currentProviders = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+
+  aiSettingsState$.providers.set({
+    ...currentProviders,
+    [config.id]: config,
+  });
+}
+
+export function removeCustomProvider(providerId: ProviderType): void {
+  const currentProviders = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+
+  const providerConfig = currentProviders[providerId];
+  if (!('isCustom' in providerConfig) || !providerConfig.isCustom) {
+    console.warn('Cannot remove built-in provider:', providerId);
+    return;
+  }
+
+  const { [providerId]: removed, ...remainingProviders } = currentProviders;
+  aiSettingsState$.providers.set(remainingProviders);
+
+  // Also remove any models associated with this provider
+  const currentModels = aiSettingsState$.models.get() as Record<
+    string,
+    ModelConfig
+  >;
+  const updatedModels = Object.fromEntries(
+    Object.entries(currentModels).filter(
+      ([_, model]) => model.provider !== providerId
+    )
+  );
+  aiSettingsState$.models.set(updatedModels);
+
+  // Clear selected model if it belongs to the removed provider
+  const selectedModelId = aiSettingsState$.selectedModelId.get();
+  if (
+    selectedModelId &&
+    currentModels[selectedModelId]?.provider === providerId
+  ) {
+    aiSettingsState$.selectedModelId.set(null);
+  }
+}
+
+export function getAllProviders(): ProviderConfig[] {
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  return Object.values(providers);
+}
+
+export function getCustomProviders(): CustomProviderConfig[] {
+  return getAllProviders().filter(
+    (provider): provider is CustomProviderConfig => {
+      return 'isCustom' in provider && provider.isCustom === true;
+    }
+  );
+}
+
+export function isProviderIdAvailable(id: string): boolean {
+  const providers = aiSettingsState$.providers.get() as Record<
+    ProviderType,
+    ProviderConfig
+  >;
+  return !(id in providers);
+}
+
+export function generateUniqueProviderId(baseName: string): string {
+  let counter = 1;
+  let id = baseName;
+
+  while (!isProviderIdAvailable(id)) {
+    id = `${baseName}-${counter}`;
+    counter++;
+  }
+
+  return id;
 }
 
 export function getEnabledProviders(): ProviderConfig[] {

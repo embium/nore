@@ -9,7 +9,11 @@ import { fetchAvailableModels } from '../state/aiSettings/aiModels/modelFactory'
 
 // Types
 import type { ProviderType } from '@/types/ai';
-import { PROVIDER_CONFIG_MAP, AVAILABLE_PROVIDERS } from '@/types/ai';
+import {
+  PROVIDER_CONFIG_MAP,
+  AVAILABLE_PROVIDERS,
+  getProviderConfigRequirements,
+} from '@/types/ai';
 import type { GeminiModelInfo } from '@/lib/ai/models/gemini';
 
 /**
@@ -52,7 +56,10 @@ export function useProviderConfig() {
   const providerConfig = getProviderConfig(activeProvider);
 
   // Get current provider configuration requirements
-  const currentProviderConfig = PROVIDER_CONFIG_MAP[activeProvider];
+  const currentProviderConfig = getProviderConfigRequirements(
+    activeProvider,
+    providerConfig
+  );
 
   // Reset status and models when provider changes
   useEffect(() => {
