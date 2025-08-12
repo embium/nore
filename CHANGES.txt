@@ -1,3 +1,8 @@
+
+## 0.1.1
+
+- Removed "Supported Featurs" from custom providers
+
 ## 0.1.0
 
 - Add a way to create custom providers
