@@ -419,43 +419,6 @@ export const CustomProviderForm: React.FC<CustomProviderFormProps> = ({
               </div>
             ))}
           </div>
-
-          <Separator className="my-2" />
-
-          {/* Supported Features */}
-          <div className="space-y-4">
-            <Label>Supported Features</Label>
-            <div className="grid grid-cols-2 gap-4">
-              {Object.entries(formData.supportedFeatures).map(
-                ([feature, enabled]) => (
-                  <div
-                    key={feature}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      id={`feature-${feature}`}
-                      checked={enabled}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          supportedFeatures: {
-                            ...prev.supportedFeatures,
-                            [feature]: checked === true,
-                          },
-                        }))
-                      }
-                    />
-                    <Label
-                      htmlFor={`feature-${feature}`}
-                      className="text-sm font-normal capitalize"
-                    >
-                      {feature.replace(/([A-Z])/g, ' $1').trim()}
-                    </Label>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
         </div>
 
         <DialogFooter>

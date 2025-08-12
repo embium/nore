@@ -208,25 +208,6 @@ export const CustomProviderManager: React.FC<CustomProviderManagerProps> =
                               </div>
                             )}
                         </div>
-
-                        <div className="mt-4">
-                          <p className="text-sm font-medium mb-2">
-                            Supported Features:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(
-                              provider.supportedFeatures || {}
-                            ).map(([feature, enabled]) => (
-                              <Badge
-                                key={feature}
-                                variant={enabled ? 'default' : 'outline'}
-                                className="text-xs"
-                              >
-                                {feature.replace(/([A-Z])/g, ' $1').trim()}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
                       </CardContent>
                     </Card>
                   ))}
